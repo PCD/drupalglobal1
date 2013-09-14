@@ -4,6 +4,7 @@ sites/*/settings*.php
 robots.txt
 cache
 .DS_Store
+*/.DS_Store
 
 # Ignore some Sites
 sites/corasdeportivotepic.mx
