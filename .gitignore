@@ -3,6 +3,7 @@ sites/*/settings*.php
 .htaccess
 robots.txt
 cache
+.DS_Store
 
 # Ignore some Sites
 sites/corasdeportivotepic.mx
