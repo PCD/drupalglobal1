@@ -5,6 +5,7 @@ robots.txt
 cache
 .DS_Store
 */.DS_Store
+sites/*/.DS_Store
 
 # Ignore some Sites
 sites/corasdeportivotepic.mx
