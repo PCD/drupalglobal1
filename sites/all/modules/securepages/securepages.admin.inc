@@ -67,6 +67,12 @@ function securepages_settings($form, &$form_state) {
     '#options' => array_map('check_plain', user_roles(TRUE)),
     '#default_value' => variable_get('securepages_roles', array()),
   );
+  $form['securepages_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Debugging'),
+    '#default_value' => variable_get('securepages_debug', 0),
+    '#description' => t('Turn on debugging to allow easier testing of settings'),
+  );
   $form['#submit'] = array('securepages_settings_submit');
   return system_settings_form($form);
 }
