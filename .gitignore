@@ -1,0 +1,18 @@
+# Ignore configuration files that may contain sensitive information.
+sites/*/settings*.php
+.htaccess
+robots.txt
+cache
+
+# Ignore some Sites
+sites/corasdeportivotepic.mx
+sites/drupal.diarioindependencia.com
+sites/tepicnay.mx
+sites/default
+sites/eldiariodenayarit.com
+sites/nayarit100.mx
+sites/www.fundacionrie.org
+
+# Ignore paths that contain user-generated content.
+sites/*/files
+sites/*/private
