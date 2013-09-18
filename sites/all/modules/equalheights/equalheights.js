@@ -13,7 +13,7 @@
       }
       function equalHeightsTrigger() {
         $.each(eqClass, function(eqClass, setting) {
-          var target = $('.' + setting.elClass);          
+          var target = $(setting.selector);
           target.height('auto');
           target.imagesLoaded({
             callback: function($images, $proper, $broken) {

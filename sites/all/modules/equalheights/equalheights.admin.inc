@@ -29,7 +29,7 @@ function equalheights_admin($form, $form_state) {
   for ($index = 0; $index < $rows_count; $index++) {
     if (isset($classes[$index])) {
       $setting = $classes[$index];
-      $form['equalheights_classes'][$index] = equalheights_settings_fields($setting['elClass'], $setting['minheight'], $setting['maxheight'], $setting['overflow']);
+      $form['equalheights_classes'][$index] = equalheights_settings_fields($setting['selector'], $setting['minheight'], $setting['maxheight'], $setting['overflow']);
     }
     else {
       $form['equalheights_classes'][$index] = equalheights_settings_fields();
@@ -65,7 +65,7 @@ function equalheights_admin($form, $form_state) {
 function equalheights_admin_validate($form, &$form_state) {
 
   foreach ($form_state['values']['equalheights_classes'] as $i => $class) {
-    if (!empty($class['elClass'])) {
+    if (!empty($class['selector'])) {
       if (!empty($class['minheight']) && !is_numeric($class['minheight'])) {
         form_set_error('', t('Min height must be a number.'));
       }
@@ -80,13 +80,13 @@ function equalheights_admin_submit($form, &$form_state) {
   $settings = array();
 
   foreach ($form_state['values']['equalheights_classes'] as $i => $class) {
-    if (!empty($class['elClass']) && $class['delete'] == 0) {
+    if (!empty($class['selector']) && $class['delete'] == 0) {
       // If only maxheight is set, make minheight equal to '0'
       if (!$class['minheight'] && !empty($class['maxheight'])) {
         $class['minheight'] = '0';
       }
       $settings[] = array(
-        'elClass' => trim($class['elClass'], '.'),
+        'selector' => _equalheights_selector_fold($class['selector']),
         'minheight' => trim($class['minheight']),
         'maxheight' => trim($class['maxheight']),
         'overflow' => $class['overflow'],
@@ -98,7 +98,29 @@ function equalheights_admin_submit($form, &$form_state) {
   drupal_set_message(t('Settings have been set.'));
 }
 
-function equalheights_settings_fields($el_class = '', $minheight = '', $maxheight = '', $overflow = 'auto') {
+/**
+ * Remove newlines from selector.
+ *
+ * New lines are not allowed in the jQuery selector. Queries like:
+ *   jQuery(".region\n .header");
+ * fail.
+ */
+function _equalheights_selector_fold($selector) {
+  return trim(trim(preg_replace(array("/\s+/", "/\n/", "/\r/"), ' ', $selector)), ',');
+}
+
+/**
+ * Make a better user readable version of the selector.
+ *
+ * Replace comma by comma followed by a new line.
+ * Spaces before and after a comma are removed.
+ */
+function _equalheights_selector_unfold($selector) {
+  $select = _equalheights_selector_fold($selector);
+  return preg_replace("/\s*\,\s*/", ",\n", $selector);
+}
+
+function equalheights_settings_fields($selector = '', $minheight = '', $maxheight = '', $overflow = 'auto') {
   $form['#tree'] = TRUE;
   $form['delete'] = array(
     '#type' => 'checkbox',
@@ -107,21 +129,23 @@ function equalheights_settings_fields($el_class = '', $minheight = '', $maxheigh
       'title' => t('Delete the class'),
     ),
   );
-  $form['elClass'] = array(
-    '#type' => 'textfield',
-    '#default_value' => $el_class,
-    '#size' => 32,
-    '#maxlength' => 255,
+  $form['selector'] = array(
+    '#type' => 'textarea',
+    '#default_value' => _equalheights_selector_unfold($selector),
+    '#rows' => 3,
+    '#cols' => 20,
     '#attributes' => array(
-      '#title' => t("The name of the class to be used, no '.' is needed"),
+      'title' => t("The selector of the elements that need equal height"),
     ),
+    '#description' => t("You may enter one or several compound selectors seperated by a comma.<br>
+                         New lines will be injected before commas."),
   );
   $form['minheight'] = array(
     '#type' => 'textfield',
     '#default_value' => $minheight,
     '#size' => 4,
     '#attributes' => array(
-      '#title' => t('Minimum height of the class, in pixels'),
+      'title' => t('Minimum height of the class, in pixels'),
     ),
   );
   $form['maxheight'] = array(
@@ -129,7 +153,7 @@ function equalheights_settings_fields($el_class = '', $minheight = '', $maxheigh
     '#default_value' => $maxheight,
     '#size' => 4,
     '#attributes' => array(
-      '#title' => t('Maximum height of the class, in pixels'),
+      'title' => t('Maximum height of the class, in pixels'),
     ),
   );
   $form['overflow'] = array(
@@ -141,7 +165,7 @@ function equalheights_settings_fields($el_class = '', $minheight = '', $maxheigh
       'visible' => t('visible'),
     ),
     '#attributes' => array(
-      '#title' => t('Overflow value if the content taller than the max height'),
+      'title' => t('Overflow value if the content taller than the max height'),
     ),
   );
   return $form;
@@ -154,7 +178,7 @@ function theme_equalheights_classes($variables) {
     // Build the table row.
     $rows[$key] = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['elClass']), 'class' => 'equalheights-class'),
+        array('data' => drupal_render($form[$key]['selector']), 'class' => 'equalheights-class'),
         array('data' => drupal_render($form[$key]['minheight']), 'class' => 'equalheights-minheight'),
         array('data' => drupal_render($form[$key]['maxheight']), 'class' => 'equalheights-mzxheight'),
         array('data' => drupal_render($form[$key]['overflow']), 'class' => 'equalheights-overflow'),
@@ -167,7 +191,7 @@ function theme_equalheights_classes($variables) {
      }
  }
   $header = array(
-    array('data' => t('Class of the element'), 'title' => t('The class of the element to be used with equalheights.')),
+    array('data' => t('Class or tag of the element'), 'title' => t('The class of the element to be used with equalheights.')),
     array('data' => t('Min height (optional)'), 'title' => t('Minimum height of the element')),
     array('data' => t('Max height (optional)'), 'title' => t('Maximum height of the element')),
     array('data' => t('Overflow'), 'title' => t('Overflow value')),

@@ -1,0 +1,14 @@
+Equalheight jQquery 7.x-2.2
+---------------------------
+- Change hook_init() to hook_page_build()
+- Added drush integration
+- Issue #1714156 by Martijn Houtman, clemens.tolboom. fietserwin:
+  Added Allow jQuery style selectors (not only element classes).
+- Issue #2083425 by clemens.tolboom: Added Make text field for selector a text area
+- Adjusted the version of imagesloaded plugin to use
+- Added CHANGELOG
+
+Equalheight jQquery 7.x-2.1
+---------------------------
+- Added dependnecy on Libraries API 2.x
+- Imagesloaded plugin (v2) is required to calculate height after all images are loaded

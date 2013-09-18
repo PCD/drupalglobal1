@@ -1,9 +1,10 @@
 <?php
-/*
+
+/**
  * @file
  */
 
-/*
+/**
  * Implements hook_uninstall().
  */
 function equalheights_uninstall() {
@@ -12,9 +13,7 @@ function equalheights_uninstall() {
     ->execute();
 }
 
-/*
- * Implements hook_update().
- *
+/**
  * Removes no longer used variables
  */
 function equalheights_update_7000() {
@@ -53,9 +52,7 @@ function equalheights_update_7000() {
   }
 }
 
-/*
- * Implements hook_update().
- *
+/**
  * Transform classes into elClasses
  */
 function equalheights_update_7001() {
@@ -63,6 +60,18 @@ function equalheights_update_7001() {
   foreach ($equalheightsclasses as $key => $settings) {
     $equalheightsclasses[$key]['elClass'] = $settings['class'];
     unset($equalheightsclasses[$key]['class']);
+  }
+  variable_set('equalheights_css_classes', $equalheightsclasses);
+}
+
+/**
+ * Convert previous class selectors into jQuery selectors
+ */
+function equalheights_update_7002() {
+  $equalheightsclasses = variable_get('equalheights_css_classes', array());
+  foreach ($equalheightsclasses as $key => $settings) {
+    $equalheightsclasses[$key]['selector'] = "." . $settings['elClass'];
+    unset($equalheightsclasses[$key]['elClass']);
   }
   variable_set('equalheights_css_classes', $equalheightsclasses);
 }

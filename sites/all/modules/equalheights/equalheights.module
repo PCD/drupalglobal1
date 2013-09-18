@@ -21,7 +21,8 @@ function equalheights_help($path = '', $arg = NULL) {
     case 'admin/help#equalheights':
     case 'admin/config/development/equalheights':
       $output = '<p>' . t("Implements a jQuery plugin that makes the height of the elements equal.") . '</p>';
-      $output .= t("Add CSS classes that you need to be of equal height, without a leading period ('.') . <br />");
+      $output .= t("Add elements or CSS classes that you need to be of equal height (with a leading period ('.') ) . <br />");
+      $output .= t('Note: you can combine multiple selectors, i.e. "header, .wrapper".');
       $output .= t('You can optionally set minimum and maximum height, overflow value.&nbsp;');
       $output .= t('(<a href="@about">Read more about the plugin.</a>) ', array('@about' => 'http://www.cssnewbie.com/equalheights-jquery-plugin/'));
       break;
@@ -55,7 +56,7 @@ function equalheights_libraries_info() {
     'name' => 'jquery imagesloaded',
     'vendor url' => 'https://github.com/desandro/imagesloaded',
     'download url' => 'https://github.com/desandro/imagesloaded',
-    // 2.1.1
+    // 2.1.12
     'version arguments' => array(
       'file' => 'jquery.imagesloaded.js',
       'pattern' => '@plugin v([0-9\.a-z]+)@',
@@ -88,16 +89,14 @@ function equalheights_libraries_info() {
 }
 
 /**
- * Implements hook_init().
+ * Implements hook_page_build().
  */
-function equalheights_init() {
-  // Adding jquery.equalheights.js as a library.
-  drupal_add_library('equalheights', 'jquery-equalheights', TRUE);
+function equalheights_page_build() {
   $equalheightsclasses = variable_get('equalheights_css_classes', array());
   if (!empty($equalheightsclasses)) {
+    // Adding jquery.equalheights.js as a library.
     drupal_add_library('equalheights', 'jquery-equalheights', TRUE);
     equalheights_load_libraries($equalheightsclasses);
-
   }
 }
 
@@ -152,7 +151,7 @@ function equalheights_load_libraries($equalheightsclasses) {
     }
   }
   else {
-    $message = t('The imagesloaded library was not found! Please following the instructions from the README.tx to get the plugin.');
-    //drupal_set_message($message, $type = 'error');
+    $message = t('The imagesloaded library was not found! Please following the instructions from the README.txt to get the plugin.');
+    drupal_set_message($message, $type = 'error');
   }
 }
