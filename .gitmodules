@@ -1,0 +1,18 @@
+[submodule "sites/local.nayarit100.com"]
+	path = sites/local.nayarit100.com
+	url = git@github.com:PCD/nayarit100.git
+[submodule "sites/local.fundacion.com"]
+	path = sites/local.fundacion.com
+	url = git@github.com:PCD/fundacionrie.git
+[submodule "sites/local.gobierno.com"]
+	path = sites/local.gobierno.com
+	url = git@github.com:PCD/gobiernodelagente.git
+[submodule "sites/local.tepicnay.com"]
+	path = sites/local.tepicnay.com
+	url = git@github.com:PCD/tepicnay.git
+[submodule "sites/local.diarionayarit.com"]
+	path = sites/local.diarionayarit.com
+	url = git@github.com:PCD/eldiariodenayarit.git
+[submodule "sites/local.coras.com"]
+	path = sites/local.coras.com
+	url = git@github.com:PCD/coras.git
