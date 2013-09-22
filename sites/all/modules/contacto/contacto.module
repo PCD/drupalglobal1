@@ -81,16 +81,19 @@ function contacto_menu_registro_contacto() {
     exit;
   }
   
-  if ( ($r = contacto_search_existing_contacto($cellphone, $email)) ) {
-    if ( $r > 0 ) {
-      $response['valid'] = 0;
-      if ( $r == 1 ) {
-        $response['message'] = 'Lo sentimos, el número de celular que ingresaste ya ha sido registrado anteriormente.';
-      } else {
-        $response['message'] = 'Lo sentimos, el correo electrónico que ingresaste ya ha sido registrado anteriormente.';
+  if ( ($nid = contacto_search_existing_contacto($cellphone, $email)) ) {
+    if ( $nid > 0 ) {
+      $node = node_load($nid);
+      if ( isset($node->field_evento[$node->language]) && !empty($node->field_evento[$node->language]) ) {
+        foreach($node->field_evento[$node->language] as $i => $term) {
+          if ( $term['tid'] == $_POST['tid'] ) {
+            $response['valid'] = 0;
+            $response['message'] = 'Lo sentimos, el número de celular que ingresaste o el correo electrónico ya ha sido registrado anteriormente para este concurso.';
+            print json_encode($response);
+            exit;
+          }
+        }
       }
-      print json_encode($response);
-      exit;
     }
   }
   
@@ -123,7 +126,7 @@ function contacto_search_existing_contacto($cellphone, $mail) {
   $sql = sprintf($sql, trim($cellphone));
   $results = db_query($sql);
   if ( ($row = $results->fetchAssoc())) {
-    return 1;
+    return $row['nid'];
   }
   
   // Search for email
@@ -131,7 +134,7 @@ function contacto_search_existing_contacto($cellphone, $mail) {
   $sql = sprintf($sql, trim($mail));
   $results = db_query($sql);
   if ( ($row = $results->fetchAssoc())) {
-    return 2;
+    return $row['nid'];
   }
   
   return 0;
