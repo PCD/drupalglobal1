@@ -1,9 +1,22 @@
-
+#loginRadiusFormTitle, #loginRadiusFormDiv {
+padding: 0 13px 13px 15px;
+}
 #edit-thanks-block{
 background-color: #EAF7FF;
 border: solid 1px;
 border-color: rgb(195, 239, 250);
 padding-bottom: 10px;
+border-radius: 7px;
+float: left;
+width: 60%;
+height: 143px;
+margin-top: 0px !important;
+margin-right: 15px;
+}
+#edit-update-block{
+background-color: #FFFFE0;
+border: solid 1px;
+border-color: rgb(195, 239, 250);
 border-radius: 7px;
 }
 #socialsharing_providers_list > div {
@@ -71,30 +84,6 @@ margin-left:0px;
 #socialsharing_question{
 margin-top: 64px;
 }
-
-#thanks_block{
-background-color: #EAF7FF;
-border: solid 1px;
-border-color: rgb(195, 239, 250);
-padding-bottom: 10px;
-border-radius: 7px;
-padding: 10px;
-width: 350px;
-height: 172px;
-margin-right: 4px;
-float: left;
-}
-#sociallogin_get_update{
-background-color: #FFFFE0;
-border: solid 1px;
-border-color: rgb(195, 239, 250);
-padding-bottom: 10px;
-border-radius: 7px;
-padding: 10px;
-height: 172px;
-width: 376px;
-margin-top: -30px;
-}
 #edit-lrshare-iconsprite32-facebook{
 padding: 0px;
 }
@@ -152,52 +141,7 @@ padding: 10px;
 float: none;
 margin-top: 113px;
 }
-.twitter_box {
-    width: 58px; height: 34px;
-    position: relative;
-    background: #fff;
-    border: 1px solid #bbb;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    -ms-border-radius: 3px;
-    -o-border-radius: 3px;
-    border-radius: 3px;
-    margin-bottom: 6px;
-	margin-left: 55px;
-    }
-.twitter_box:after,
-.twitter_box:before {
-    width: 0; height: 0;
-    position: absolute;
-    top: 100%;
-    border: solid transparent;
-    pointer-events: none;
-    content: " ";
-    }
-.twitter_box:after {
-    left: 50%;
-    border-top-color: #fff;
-    border-width: 3px;
-    margin-left: -3px;
-    }
-.twitter_box:before {
-    left: 50%;
-    border-top-color: #aaa;
-    border-width: 4px;
-    margin-left: -4px;
-    }
-.twitter_box #followers {
-    width: 100%; height: auto;
-    position: absolute;
-    top: 0px; left: 0px;
-    font-family: "Helvetica Neue", helvetica, arial, sans-serif;
-    font-size: 16px; line-height: 34px;
-    letter-spacing: 0;
-    white-space: nowrap;
-    color: #333;
-    text-align: center;
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
+
 #lrsharing_divwhite{
 border-color: transparent transparent #fff;
 border-style: dashed dashed solid;

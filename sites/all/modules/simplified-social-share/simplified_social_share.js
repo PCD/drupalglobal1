@@ -11,6 +11,8 @@ var selectedverticalProviderList= document.getElementsByName('socialsharing_vert
 document.write("<script type='text/javascript'>var islrsharing = true; var islrsocialcounter = true;</script>");
 document.write("<script src='//share.loginradius.com/Content/js/LoginRadius.js' type='text/javascript'></script>");
 window.onload = function(){
+	if(document.getElementById("lr_username") != null)
+	lr_toggle_form('login');
 	 jQuery("#edit-socialsharing-horizontal-images-0,#edit-socialsharing-horizontal-images-1").click(function(){
 		sharing_horizonatl_show(); 
 	});  
@@ -30,14 +32,15 @@ window.onload = function(){
 	sharingproviderlist();
 	counterproviderlist();
 	verticalsharingproviderlist();
-	verticalcounterproviderlist();	
+	verticalcounterproviderlist();
   jQuery("#socialsharing_rearrange_providers").sortable({
     revert: true
   });
    jQuery("#socialsharing_vertical_rearrange_providers").sortable({
     revert: true
   });
-     loginRadiusToggleShareTheme(selectedSharingTheme[0].value);
+   if(selectedSharingTheme[0])
+    loginRadiusToggleShareTheme(selectedSharingTheme[0].value);
      jQuery(".socialsharing_rearrange_providers").find("li").unwrap();
 	 jQuery(".socialsharing_vertical_rearrange_providers").find("li").unwrap();
 	 jQuery("#socialsharing_veritical").click(function(){
@@ -170,6 +173,7 @@ function loginRadiusverticalSharingLimit(elem){
 function verticalsharingproviderlist() {
 	var sharing =  $SS.Providers.More;
 	var div = document.getElementById('socialsharing_vetical_show_providers_list');
+	if( div != null) {
 	for( var i= 0 ; i< sharing.length;i++){
 		 var listItem = document.createElement('div');
   		 listItem.setAttribute('class', 'form-item form-type-checkbox form-item-socialsharing-vertical-show-providers-list-'+sharing[i].toLowerCase());
@@ -197,11 +201,13 @@ function verticalsharingproviderlist() {
 			}
 		}
 	}
+  }
 }
 //// show Provider List for vertical Social counter.
 function verticalcounterproviderlist(){
 	var counter = $SC.Providers.All;
 	var div = document.getElementById('socialcounter_vertical_show_providers_list');
+	if( div != null) {
 		for( var i= 0 ; i< counter.length;i++){
 		var value= counter[i].split(' ').join('');
 		value = value.replace("++", "plusplus");
@@ -225,8 +231,7 @@ function verticalcounterproviderlist(){
           label.appendChild(labeltext);
 		  listItem.appendChild(provider);
 		  listItem.appendChild(label);
-		  div.appendChild(listItem);
-		  
+		  div.appendChild(listItem);		  
 	}
 	if(selectedcounterverticalProviderList.length >0) {
 		for(var i = 0; i < selectedcounterverticalProviderList.length; i++){
@@ -238,11 +243,13 @@ function verticalcounterproviderlist(){
 			}
 		}
 	}
+	}
 }
 // show Provider List for horizontal Social Sharing.
 function sharingproviderlist(){
 	var sharing =  $SS.Providers.More;
 	var div = document.getElementById('socialsharing_providers_list');
+	if( div != null) {
 	for( var i= 0 ; i< sharing.length;i++){
 		 var listItem = document.createElement('div');
   		 listItem.setAttribute('class', 'form-item form-type-checkbox form-item-socialsharing-show-providers-list-'+sharing[i].toLowerCase());
@@ -269,11 +276,13 @@ function sharingproviderlist(){
 			}
 		}
 	}
+	}
 }
 // show Provider List for horizontal Social counter.
 function counterproviderlist() {
 	var counter = $SC.Providers.All;
 	var div = document.getElementById('socialcounter_show_providers_list');
+	if( div != null) {
 		for( var i= 0 ; i< counter.length;i++){
 		var value= counter[i].split(' ').join('');
 		value = value.replace("++", "plusplus");
@@ -309,6 +318,7 @@ function counterproviderlist() {
 			}
 		}
 	}
+}
 }
 // show Sharing Horizontal
 function sharing_horizonatl_show(){
@@ -367,12 +377,14 @@ function hidden_horizontal_widget(){
 	jQuery(".form-item.form-type-radios.form-item-socialsharing-enable-vertical-share").removeClass("element-invisible");
 	jQuery(".form-item.form-type-radios.form-item-socialsharing-vertical-location").removeClass("element-invisible");
 	jQuery(".form-item.form-type-radios.form-item-socialsharing-horizontal-location").addClass("element-invisible");
+	if( jQuery("#edit-socialsharing-vertical-location-block")[0] != null) {
 	var isChecked = jQuery("#edit-socialsharing-vertical-location-block")[0].checked;
 	if(isChecked) {
 		display_block_vertical("block");	
 	}
 	else {
 		display_block_vertical("content");	
+	}
 	}
 }
 // Show only Horizontal widget options.
@@ -391,6 +403,7 @@ function display_horizontal_widget(){
 	jQuery(".form-item.form-type-select.form-item-socialsharing-bottom-weight").removeClass("element-invisible");
 	jQuery(".form-item.form-type-radios.form-item-socialsharing-vertical-location").addClass("element-invisible");
 	jQuery(".form-item.form-type-radios.form-item-socialsharing-horizontal-location").removeClass("element-invisible");
+	if( jQuery("#edit-socialsharing-horizontal-location-block")[0] != null) {
 	var isChecked = jQuery("#edit-socialsharing-horizontal-location-block")[0].checked;
 	if(isChecked) {
 		display_block_horizontal("block");	
@@ -401,6 +414,7 @@ function display_horizontal_widget(){
 		display_block_horizontal("links");	
 		else
 		display_block_horizontal("content");	
+	}
 	}
 }
 
@@ -462,4 +476,36 @@ function display_block_vertical(value){
 		jQuery(".form-item.form-type-radios.form-item-socialsharing-vertical-show-pages").removeClass("element-invisible");
 		jQuery(".form-item.form-type-textarea.form-item-socialsharing-vertical-show-exceptpages").removeClass("element-invisible");
 	}
+}
+
+function lr_toggle_form(val){
+	if(val == 'login'){
+		document.getElementById('lr_site').parentNode.style.display = 'none';
+		document.getElementById('lr_confirm_password').parentNode.style.display = 'none';
+		document.getElementById('lr_toggle_form_link').innerHTML = 'New to LoginRadius, Register Now!';
+		document.getElementById('lr_toggle_form_link').setAttribute('onclick', 'lr_toggle_form("register")');
+		document.getElementById('lr_submit').value = 'Login';
+		document.getElementById('lr_form_title').innerHTML = 'Login to your LoginRadius Account to change settings as per your requirements!';
+	}
+	else{
+		document.getElementById('lr_site').parentNode.style.display = 'block';
+		document.getElementById('lr_confirm_password').parentNode.style.display = 'block';
+		document.getElementById('lr_toggle_form_link').innerHTML = 'Already have an account?';
+		document.getElementById('lr_toggle_form_link').setAttribute('onclick', 'lr_toggle_form("login")');
+		document.getElementById('lr_submit').value = 'Register';
+		document.getElementById('lr_form_title').innerHTML = 'Register to your LoginRadius Account to change settings as per your requirements!';
+	}
+	document.getElementById('loginRadiusMessage').innerHTML = '';
+}
+// confirm password validation
+function lr_confirm_password_validate(){
+var loginRadiusNotificationDiv = document.getElementById('loginRadiusMessage');
+if(document.getElementById('lr_password').value.trim() != document.getElementById('lr_confirm_password').value.trim()){
+loginRadiusNotificationDiv.innerHTML = 'Passwords do not match.';
+loginRadiusNotificationDiv.style.color = 'red';
+return false;
+}else{
+loginRadiusNotificationDiv.innerHTML = '';
+return true;
+}
 }
