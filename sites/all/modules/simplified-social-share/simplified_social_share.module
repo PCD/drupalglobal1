@@ -11,8 +11,8 @@
  */
 function simplified_social_share_menu() {
   $items['admin/config/people/simplified_social_share'] = array(
-    'title' => 'Social Share',
-    'description' => 'Configure setting for LoginRadius Social Share',
+    'title' => 'Simplified Social Share',
+    'description' => 'Configure setting for LoginRadius Simplified Social Share',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('simplified_social_share_admin_settings'),
     'access arguments' => array('administer social share'),
@@ -28,17 +28,259 @@ function simplified_social_share_menu() {
     'weight' => -10,
     'file' => 'simplified_social_share.admin.inc',
   );
-   $items['admin/config/people/simplified_social_share/help'] = array(
-    'title' => 'Help',
-    'page callback' => 'simplified_social_share_user_help',
-    'access arguments' => array('administer social share'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 5,
-    'file' => 'simplified_social_share.admin.inc',
+  $items['simplified_social_share/lr_Login_submit'] = array(
+    'page callback' => 'simplified_social_share_lr_Login_submit',
+    'access arguments' => array('access simplified_social_share via ajax'),
+    'type' => MENU_CALLBACK,
   );
   return $items;
 }
-
+/**
+* Check Connection Method CURL/FSOCKOPEN is Working.
+*/
+function login_radius_check_connection($method) { 
+  $ValidateUrl = "https://hub.loginradius.com/ping/ApiKey/ApiSecrete";
+  $JsonResponse = lr_call_api($ValidateUrl, $method);
+  $UserAuth = json_decode($JsonResponse);
+  if (isset($UserAuth->ok)) {
+    return "ok";
+  }
+  elseif ($JsonResponse == "service connection timeout") {
+    return "service connection timeout";
+  }
+  elseif ($JsonResponse == "timeout") {
+    return "timeout";
+  }
+  else {
+    return "connection error";
+  }
+}
+/**
+* Get Result from LoginRadius API.
+*/
+function lr_get_auth($ValidateUrl, $method) { 
+  $JsonResponse = lr_call_api($ValidateUrl, $method, true);
+  $response = json_decode($JsonResponse);
+  return $response;
+}
+/**
+* Call API through CURL/FSOCKOPEN. 
+*/
+function lr_call_api($ValidateUrl, $method = "", $post = false) {
+  if ($method == "curl" && in_array('curl', get_loaded_extensions())) {
+    $curl_handle = curl_init(); 
+    curl_setopt($curl_handle, CURLOPT_URL, $ValidateUrl); 
+    curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($curl_handle, CURLOPT_TIMEOUT, 5);
+    if ($post) {
+      curl_setopt($curl_handle, CURLOPT_POST, 1);
+      curl_setopt($curl_handle, CURLOPT_POSTFIELDS, '');
+    }
+    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false); 
+    if (ini_get('open_basedir') == '' && (ini_get('safe_mode') == 'Off' or !ini_get('safe_mode'))) {
+      curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, 1); 
+      curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true); 
+    }
+    else {
+      curl_setopt($curl_handle, CURLOPT_HEADER, 1); 
+      $url = curl_getinfo($curl_handle, CURLINFO_EFFECTIVE_URL);
+      curl_close($curl_handle);
+      $curl_handle = curl_init(); 
+      $url = str_replace('?', '/?', $url); 
+      curl_setopt($curl_handle, CURLOPT_URL, $url); 
+      curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+   }
+   $JsonResponse = curl_exec($curl_handle); 
+   $httpCode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+   if (in_array($httpCode, array(400, 401, 404, 500, 503)) && $httpCode != 200) {
+     return "service connection timeout";
+   }
+   else {
+     if (curl_errno($curl_handle) == 28) {
+       return "timeout";
+     }
+   }
+  curl_close($curl_handle);
+  }
+  else {
+    if ($post) {
+      $postdata = http_build_query(
+        array(
+          'var1' => 'val'
+        )
+      );
+      $options = array('http' =>
+        array(
+          'method'  => 'POST',
+          'timeout' => 10,
+          'header'  => 'Content-type: application/x-www-form-urlencoded',
+          'content' => $postdata,
+          'ignore_errors' => true
+        )
+      );
+      $context  = stream_context_create($options);
+    }
+    else {
+      $context = NULL;
+    }
+    $JsonResponse = file_get_contents($ValidateUrl, false, $context);
+    if (strpos(@$http_response_header[0], "400") !== false || strpos(@$http_response_header[0], "401") !== false || strpos(@$http_response_header[0], "404") !== false || strpos(@$http_response_header[0], "500") !== false || strpos(@$http_response_header[0], "503") !== false) {
+      return "service connection timeout";
+    }
+  }
+  return $JsonResponse; 
+}
+/**
+* Hanble ajax request for Get API Key and Save API key. 
+*/ 
+function simplified_social_share_lr_Login_submit() {
+  global $base_url, $user;
+  $value = $_POST;
+  if (isset($value['apikey']) && trim($value['apikey']) != "") {
+    $settings = array(
+      'socialsharing_api_key' => $value['apikey'],
+      'socialsharing_enable_share' => '1',
+      'socialsharing_enable_horizontal_share' => '1',
+      'socialsharing_horizontal_images' => '0',
+      'socialsharing_label_string' => 'share it Now!',
+      'socialsharing_rearrange_providers_list' => array("facebook", "googleplus", "google", "pinterest", "twitter", ),
+      'socialsharing_enable_vertical_share' => '1',
+      'socialsharing_vertical_images' => '6',
+      'socialsharing_vertical_rearrange_providers_list' => array( "0" => "facebook", "1" => "googleplus", "2" => "google", "3" => "pinterest", "4" => "twitter", ),
+      'socialsharingcounter_rearrange_providers_list' => array( "0" => "Facebook Like", "1" => "Google+ +1", "2" => "Pinterest Pin it" , "3" => "LinkedIn Share", ),
+      'socialsharingcounter_vertical_rearrange_providers_list' => array( "0" => "Facebook Like", "1" => "Google+ +1", "2" => "Pinterest Pin it" , "3" => "LinkedIn Share", ),
+      'socialsharing_vertical_position' => '0',
+      'socialsharing_vertical_topweight' => '300',
+      'socialsharing_horizontal_location' => 'content',
+      'socialsharing_vertical_location' => 'content',
+      'socialsharing_position_top' => '1',
+      'socialsharing_position_bottom' => '1',
+      'socialsharing_top_weight' => '-10',
+      'socialsharing_bottom_weight' => '10',
+      'socialsharing_show_pages' => '0',
+      'socialsharing_vertical_show_pages' => '0',
+      'socialsharing_show_exceptpages' => '',
+      'socialsharing_vertical_show_exceptpages' => '',
+      'socialsharing_selected_share_interface' => 'horizontal'
+    );
+    foreach ($settings as $key => $value) {
+      if (is_array($value)) {
+        $value = array_filter($value);
+      }
+      variable_set($key, $value);
+     }
+     $result = array('message' => 'success');
+     return drupal_json_output($result);
+  }
+  if (isset($value['UserName']) && isset($value['Password'])) {
+    if (in_array('curl', get_loaded_extensions())) {
+      $response = login_radius_check_connection($method = "curl");
+      if ($response == "service connection timeout" || $response == "timeout") {
+        $result = array('status' => 0 , 'message' => 'Uh oh, looks like something went wrong. Try again in a sec!');
+        return drupal_json_output($result);
+      }
+      elseif ($response == "connection error") {
+        $result = array('status' => 0 , 'message' => 'Problem in communicating LoginRadius API. Please check if one of the API Connection method mentioned above is working.');
+        return drupal_json_output($result);
+      }
+    }
+    elseif (ini_get('allow_url_fopen') == 1) {
+      $response = login_radius_check_connection($method = "fopen");
+      if ($response == "service connection timeout" || $response == "timeout") {
+        $result = array('status' => 0 , 'message' => 'Uh oh, looks like something went wrong. Try again in a sec!');
+        return drupal_json_output($result);
+      }
+      elseif ($response == "connection error") {
+        $result = array('status' => 0 , 'message' => 'Problem in communicating LoginRadius API. Please check if one of the API Connection method mentioned above is working.');
+        return drupal_json_output($result);
+      }
+    }
+    else {
+      $result = array('status' => 0 , 'message' => 'Please check your php.ini settings to enable CURL or FSOCKOPEN');
+      return drupal_json_output($result);
+    }
+    foreach ($value as $values) {
+      if (trim($values) == "") {
+        $result = array('status' => 0 , 'message' => 'Unexpected error occurred');
+        return drupal_json_output($result);
+      }
+    }
+    if (isset($value['lr_site'])) {
+      $append = 'create';
+    }
+    else {
+      $append = 'login';
+    }
+    $queryString = array(
+      'UserName' => trim($value["UserName"]),
+      'password' => trim($value["Password"]),
+      'ip' => $_SERVER["REMOTE_ADDR"],
+      'Url' => $base_url,
+      'Useragent' =>  $_SERVER["HTTP_USER_AGENT"],
+      'Technology' => 'Drupal'
+    );
+    if (isset($value['lr_site'])) {
+      $queryString['AppName'] = trim($value['lr_site']);
+    }
+    $apiEndpoint = 'https://www.loginradius.com/api/v1/user.' . $append . '?' . http_build_query($queryString);
+    $result = lr_get_auth($apiEndpoint, $method, true);
+    if (isset($result -> errorCode)) {
+      // error in login/registration
+      $result = array('status' => 0 , 'message' => $result -> message );
+      return drupal_json_output($result);
+    }
+    else {
+    // if new user created at LR
+    if (isset($value['lr_site'])) {
+      $settings = array(
+        'socialsharing_api_key' => $result[0] -> apikey,
+        'socialsharing_enable_share' => '1',
+        'socialsharing_enable_horizontal_share' => '1',
+        'socialsharing_horizontal_images' => '0',
+        'socialsharing_label_string' => 'share it Now!',
+        'socialsharing_rearrange_providers_list' => array("facebook", "googleplus", "google", "pinterest", "twitter", ),
+        'socialsharing_enable_vertical_share' => '1',
+        'socialsharing_vertical_images' => '6',
+        'socialsharing_vertical_rearrange_providers_list' => array( "0" => "facebook", "1" => "googleplus", "2" => "google", "3" => "pinterest", "4" => "twitter", ),
+        'socialsharingcounter_rearrange_providers_list' => array( "0" => "Facebook Like", "1" => "Google+ +1", "2" => "Pinterest Pin it" , "3" => "LinkedIn Share", ),
+        'socialsharingcounter_vertical_rearrange_providers_list' => array( "0" => "Facebook Like", "1" => "Google+ +1", "2" => "Pinterest Pin it" , "3" => "LinkedIn Share", ),
+        'socialsharing_vertical_position' => '0',
+        'socialsharing_vertical_topweight' => '300',
+        'socialsharing_horizontal_location' => 'content',
+        'socialsharing_vertical_location' => 'content',
+        'socialsharing_position_top' => '1',
+        'socialsharing_position_bottom' => '1',
+        'socialsharing_top_weight' => '-10',
+        'socialsharing_bottom_weight' => '10',
+        'socialsharing_show_pages' => '0',
+        'socialsharing_vertical_show_pages' => '0',
+        'socialsharing_show_exceptpages' => '',
+        'socialsharing_vertical_show_exceptpages' => '',
+        'socialsharing_selected_share_interface' => 'horizontal'
+      );
+      foreach ($settings as $key => $values) {
+        if (is_array($values)) {
+          $values = (array_filter($values));
+        }
+        variable_set($key, $values);
+      }
+      $params = array(
+        'name' => $user->name,
+        'email' => $value['UserName'],
+      );
+      drupal_mail('simplified_social_share', 'newuser',  $value['UserName'], language_default(), $params, 'LoginRadius Team <no-reply@loginradius.com>');
+      $result = array('status' => 1 , 'message' => 'registration successful' );
+      return drupal_json_output($result);
+      }
+      else {
+      // user login at LR
+        // show APPs in admin
+        $result = array('status' => 1 , 'message' =>  'login successful', 'result' => $result );
+        return drupal_json_output($result);
+      }
+    }
+  }
+}
 /**
  * Implements hook_admin_paths().
  *
@@ -46,8 +288,8 @@ function simplified_social_share_menu() {
  */
 function simplified_social_share_admin_paths() {
   $paths = array(
-    'user/*/simplified_social_share' => TRUE,
-    'user/*/simplified_social_share/delete/*' => TRUE,
+    'user/*/simplified_social_share' => true,
+    'user/*/simplified_social_share/delete/*' => true,
   );
   return $paths;
 }
@@ -61,12 +303,35 @@ function simplified_social_share_permission() {
   $permissions = array(
     'administer social share' => array(
       'title' => t('administer social share settings'),
-      'restrict access' => TRUE,
+      'restrict access' => true,
     ),
   );
   return $permissions;
 }
+/**
+ * Implements hook_mail().
+ */
+function simplified_social_share_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'newuser':
+	  $text_body = t("Hi") . ' ' . $params['name'] 
 
+. t('
+
+Thank you for signing up with LoginRadius.
+
+You can log into www.loginradius.com with the following
+
+Email : '. $params["email"] . '
+
+We will be sending another email in a few moments to explain how to get started with LoginRadius.
+
+To stay tuned with LoginRadius updates,we highly recommend you connect with us on: <a href="https://www.facebook.com/pages/LoginRadius/119745918110130" target="_blank">Facebook</a>, <a href="https://plus.google.com/114515662991809002122/" target="_blank">Google+</a>, <a href="https://twitter.com/LoginRadius" target="_blank">Twitter</a> and/or <a href="http://www.linkedin.com/company/2748191?trk=tyah" target="_blank">LinkedIn</a>', array());
+      $message['subject'] = t('Welcome to LoginRadius');
+      $message['body'][] = $text_body;
+      break;    
+  }
+}
 
 /**
  * Implements hook_help().
@@ -84,13 +349,13 @@ function simplified_social_share_help($path) {
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('This social sharing module is developed by LoginRadius. This Social Sharing module placed social sharing widget on each node of Drupal website. see the LoginRadius') . l(t('visit site'), 'http://www.LoginRadius.com/', array('attributes' => array('target' => '_blank'))) . '</p>';
       $items = array(
-        l(t('Drupal live demo'), 'http://drupaldemo.loginradius.com/', array('attributes' => array('target' => '_blank'))),
+        l(t('Plugin Installation, Configuration and Troubleshooting'), 'http://support.loginradius.com/customer/portal/articles/1237617-drupal-social-sharing-installation', array('attributes' => array('target' => '_blank'))),
+        l(t('How to get LoginRadius API Key'), 'http://support.loginradius.com/customer/portal/articles/677100-how-to-get-loginradius-api-key-and-secret', array('attributes' => array('target' => '_blank'))),
+        l(t('Discussion Forum'), 'http://community.loginradius.com/', array('attributes' => array('target' => '_blank'))),
         l(t('About LoginRadius'), 'http://www.loginradius.com/loginradius/about', array('attributes' => array('target' => '_blank'))),
-        l(t('LoginRadius'), 'http://www.LoginRadius.com/', array('attributes' => array('target' => '_blank'))),
-        l(t('Other live demo'), 'https://www.loginradius.com/demo', array('attributes' => array('target' => '_blank'))),
-        l(t('Developers'), 'http://www.loginradius.com/developers/gettingstarted/', array('attributes' => array('target' => '_blank'))),
-        l(t('LoginRadius blog'), 'http://blog.loginradius.com/', array('attributes' => array('target' => '_blank'))),
-        l(t('LoginRadius video'), 'http://www.youtube.com/LoginRadius', array('attributes' => array('target' => '_blank'))),
+        l(t('LoginRadius Products'), 'http://www.loginradius.com/product/sociallogin', array('attributes' => array('target' => '_blank'))),
+        l(t('Social Plugins'), 'https://www.loginradius.com/loginradius-for-developers/loginRadius-cms', array('attributes' => array('target' => '_blank'))),
+        l(t('Social SDKs'), 'https://www.loginradius.com/loginradius-for-developers/loginRadius-sdks', array('attributes' => array('target' => '_blank'))),
       );
       $output .= theme('item_list', array('items' => $items, 'title' => t('Important links')));
       return $output;
@@ -150,7 +415,7 @@ function simplified_social_share_block_info() {
  */
 function simplified_social_share_block_view($delta) {
   $block = array();
-  $current_path = url($_GET['q'], array('absolute' => TRUE));
+  $current_path = url($_GET['q'], array('absolute' => true));
   $output='';
   if (variable_get('socialsharing_enable_horizontal_share') == 1 && variable_get('socialsharing_horizontal_location') == 'block') {
     if (variable_get('socialsharing_horizontal_images') == '0' || variable_get('socialsharing_horizontal_images') == '1' || variable_get('socialsharing_horizontal_images') == '2' || variable_get('socialsharing_horizontal_images') == '3') {
@@ -178,10 +443,10 @@ function theme_socialsharing_social_share($node) {
   $output = "";
   $item = menu_get_object($type = 'node', $position = 1, $path = NULL);
   $enable_clean_url = variable_get('clean_url', 0);
-  $is_path = FALSE;
+  $is_path = false;
   foreach ($node as $k => $v) {
     if ($k == "path") {
-      $is_path = TRUE;
+      $is_path = true;
     }
   }
   // This will choose the path to use.
@@ -291,7 +556,7 @@ function simplified_social_share_node_view($node, $view_mode, $langcode) {
   if (variable_get('socialsharing_enable_share') == 1) {
     if (variable_get('socialsharing_enable_horizontal_share') == 1 && variable_get('socialsharing_horizontal_location') == 'links') {
       $links['socialsharing_top'] = array(
-        'html' => TRUE,
+        'html' => true,
         'title' => theme('socialsharing_social_share', array('node' => $node, 'position' => 'horizontal')), 
         'attributes' => array('class' => 'socialsharing-buttons'),
       ); 
