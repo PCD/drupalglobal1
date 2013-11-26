@@ -42,7 +42,8 @@ function tepicnaym_block_view($delta = '') {
   switch($delta) {
     case 'mensaje_form':
       $block['subject'] = '';
-      $block['content'] = "<div id='envia-mensajes-gratis'>\n" . drupal_render(drupal_get_form('tepicnaym_message_form2')) . "</div>\n";
+      $form = drupal_get_form('tepicnaym_message_form2');
+      $block['content'] = "<div id='envia-mensajes-gratis'>\n" . drupal_render($form) . "</div>\n";
       break;
   }
 
