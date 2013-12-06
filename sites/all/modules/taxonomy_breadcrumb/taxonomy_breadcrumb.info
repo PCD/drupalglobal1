@@ -9,9 +9,9 @@ files[] = taxonomy_breadcrumb.inc
 files[] = taxonomy_breadcrumb.install
 files[] = taxonomy_breadcrumb.module
 
-; Information added by drupal.org packaging script on 2012-10-03
+; Information added by drupal.org packaging script on 2013-10-19
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "taxonomy_breadcrumb"
-datestamp = "1349226018"
+datestamp = "1382145873"
 
