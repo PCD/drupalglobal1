@@ -135,18 +135,22 @@ function equalheights_theme() {
 function equalheights_load_libraries($equalheightsclasses) {
   // Determine which variant of the script to load depending
   // on the config settings.
+  $imagesloaded_ie8 = variable_get('equalheights_imagesloaded_iele8');
+  $settings = array('classes' => $equalheightsclasses,
+                    'imagesloaded_ie8' => $imagesloaded_ie8);
   if (variable_get('equalheights_imagesloaded_min')) {
     $variant = 'minified';
   }
   else {
     $variant = 'source';
   }
+
   $library = libraries_load('imagesloaded', $variant);
   if ($library && !empty($library['loaded'])) {
     // Only load settings once.
     static $loaded = FALSE;
     if (!$loaded) {
-      drupal_add_js(array('equalHeightsModule' => $equalheightsclasses), 'setting');
+      drupal_add_js(array('equalHeightsModule' => $settings), 'setting');
       $loaded = TRUE;
     }
   }

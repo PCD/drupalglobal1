@@ -8,9 +8,9 @@ files[] = equalheights.module
 scripts[] = equalheights.js
 
 dependencies[] = libraries (2.x)
-; Information added by drupal.org packaging script on 2013-09-17
-version = "7.x-2.2"
+; Information added by  packaging script on 2013-11-19
+version = "7.x-2.3"
 core = "7.x"
 project = "equalheights"
-datestamp = "1379457415"
+datestamp = "1384829905"
 

@@ -29,7 +29,7 @@ function equalheights_admin($form, $form_state) {
   for ($index = 0; $index < $rows_count; $index++) {
     if (isset($classes[$index])) {
       $setting = $classes[$index];
-      $form['equalheights_classes'][$index] = equalheights_settings_fields($setting['selector'], $setting['minheight'], $setting['maxheight'], $setting['overflow']);
+      $form['equalheights_classes'][$index] = equalheights_settings_fields($setting);
     }
     else {
       $form['equalheights_classes'][$index] = equalheights_settings_fields();
@@ -52,7 +52,13 @@ function equalheights_admin($form, $form_state) {
     '#type' => 'checkbox',
     '#description' => t('Load the minified version of the imagesloaded plugin for performance.'),
     '#default_value' => variable_get('equalheights_imagesloaded_min', TRUE),
-    '#title' => t('Enable minified imagesloaded plugin'),
+    '#title' => t('Enable midisablenified imagesloaded plugin'),
+  );
+  $form['imagesloaded_ie8'] = array(
+    '#type' => 'checkbox',
+    '#description' => t('Disable imagesloaded plugin for <=Internet Explorer 8 (has been known to cause issues).'),
+    '#default_value' => variable_get('equalheights_imagesloaded_iele8', TRUE),
+    '#title' => t('Disable imagesloaded plugin for IE8 and earlier (recommended)'),
   );
   $form['save'] = array(
     '#type' => 'submit',
@@ -87,6 +93,7 @@ function equalheights_admin_submit($form, &$form_state) {
       }
       $settings[] = array(
         'selector' => _equalheights_selector_fold($class['selector']),
+        'mediaquery' => trim($class['mediaquery']),
         'minheight' => trim($class['minheight']),
         'maxheight' => trim($class['maxheight']),
         'overflow' => $class['overflow'],
@@ -95,6 +102,7 @@ function equalheights_admin_submit($form, &$form_state) {
   }
   variable_set('equalheights_css_classes', $settings);
   variable_set('equalheights_imagesloaded_min', $form_state['values']['imagesloaded']);
+  variable_set('equalheights_imagesloaded_iele8', $form_state['values']['imagesloaded_ie8']);
   drupal_set_message(t('Settings have been set.'));
 }
 
@@ -120,7 +128,21 @@ function _equalheights_selector_unfold($selector) {
   return preg_replace("/\s*\,\s*/", ",\n", $selector);
 }
 
-function equalheights_settings_fields($selector = '', $minheight = '', $maxheight = '', $overflow = 'auto') {
+function equalheights_settings_fields($settings = array()) {
+  // Add defaults
+  $settings += array(
+      'selector' => '',
+      'minheight' => '',
+      'maxheight' => '',
+      'overflow' => 'auto',
+      'mediaquery' => '',
+    );
+  $selector = $settings['selector'];
+  $minheight = $settings['minheight'];
+  $maxheight = $settings['maxheight'];
+  $overflow = $settings['overflow'];
+  $mediaquery = $settings['mediaquery'];
+
   $form['#tree'] = TRUE;
   $form['delete'] = array(
     '#type' => 'checkbox',
@@ -139,6 +161,17 @@ function equalheights_settings_fields($selector = '', $minheight = '', $maxheigh
     ),
     '#description' => t("You may enter one or several compound selectors seperated by a comma.<br>
                          New lines will be injected before commas."),
+  );
+  $form['mediaquery'] = array(
+    '#type' => 'textarea',
+    '#default_value' => $mediaquery,
+    '#rows' => 3,
+    '#cols' => 20,
+    '#attributes' => array(
+        'title' => t("The media query to use for this line"),
+      ),
+    '#description' => t('You may enter only one media query like "(min-width: 480px)".<br>
+                     Equalheights will be loaded for matching mediaquery'),
   );
   $form['minheight'] = array(
     '#type' => 'textfield',
@@ -179,6 +212,7 @@ function theme_equalheights_classes($variables) {
     $rows[$key] = array(
       'data' => array(
         array('data' => drupal_render($form[$key]['selector']), 'class' => 'equalheights-class'),
+        array('data' => drupal_render($form[$key]['mediaquery']), 'class' => 'equalheights-class'),
         array('data' => drupal_render($form[$key]['minheight']), 'class' => 'equalheights-minheight'),
         array('data' => drupal_render($form[$key]['maxheight']), 'class' => 'equalheights-mzxheight'),
         array('data' => drupal_render($form[$key]['overflow']), 'class' => 'equalheights-overflow'),
@@ -192,6 +226,7 @@ function theme_equalheights_classes($variables) {
  }
   $header = array(
     array('data' => t('Class or tag of the element'), 'title' => t('The class of the element to be used with equalheights.')),
+    array('data' => t('Media query to filter on'), 'title' => t('The media query.')),
     array('data' => t('Min height (optional)'), 'title' => t('Minimum height of the element')),
     array('data' => t('Max height (optional)'), 'title' => t('Maximum height of the element')),
     array('data' => t('Overflow'), 'title' => t('Overflow value')),
