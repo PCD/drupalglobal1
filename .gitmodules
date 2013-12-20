@@ -16,3 +16,6 @@
 [submodule "sites/local.coras.com"]
 	path = sites/local.coras.com
 	url = git@github.com:PCD/coras.git
+[submodule "sites/quienfalto.com"]
+	path = sites/quienfalto.com
+	url = git@github.com:PCD/quienfalto.git
