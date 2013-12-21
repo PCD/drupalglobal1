@@ -5,7 +5,9 @@
 (function($) {
   Drupal.behaviors.equalHeightsModule = {
     attach: function (context, settings) {
-      var eqClass = Drupal.settings.equalHeightsModule.classes;
+      if (Drupal.settings.equalHeightsModule) {
+        var eqClass = Drupal.settings.equalHeightsModule.classes;
+      }
       if (eqClass) {
         equalHeightsTrigger();
         $(window).bind('resize', function () {
