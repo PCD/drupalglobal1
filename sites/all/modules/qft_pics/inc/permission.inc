@@ -15,9 +15,9 @@ function qft_pics_permission() {
  * Gives or declined access to Node Pics export.
  */
 function qft_pics_access_pics($node, $access, $key) {
-  /*if ( $node->type != 'galeria' ) {
+  if ( $node->type != 'galeria' ) {
     return false;
-  }*/
+  }
   
   if ( $node->status != 1 ) {
     return false;
