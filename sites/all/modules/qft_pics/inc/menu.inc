@@ -24,21 +24,28 @@ function qft_pics_menu() {
  * Returns a json export of all the pics of a gallery.
  */
 function qft_pics_menu_pics($node) {
+  $response = array(
+    'title' => trim($node->title), 
+    'description' => '', 
+    'pics' => array(), 
+  );
+  if ( isset($node->body[$node->language][0]['safe_value']) ) {
+    $response['description'] = trim($node->body[$node->language][0]['safe_value']);
+  }
   $pics = array(
     'src' => array(), 
   );
-  foreach($node->field_image_multiple[$node->language] as $pic) {
-    $pics['src'][] = file_create_url($pic['uri']);
-  }
   $styles = qft_pics_image_styles();
-  foreach($pics['src'] as $key => $pic_path) {
-    foreach($styles as $style) {
-      $pics[$style][] = image_style_url($style, $pic_path);
+  foreach($node->field_images[$node->language] as $pic) {
+    $pics['src'][] = file_create_url($pic['uri']);
+    foreach($styles as $style_machine => $style) {
+      $pics[$style_machine][] = image_style_url($style, $pic['uri']);
     }
   }
+  $response['pics'] = $pics;
   header('Cache-Control: no-cache, must-revalidate');
   header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
   header('Content-type: application/json');
-  print json_encode($pics);
+  print json_encode($response);
   exit;
 }
