@@ -13,7 +13,7 @@ function qft_pics_menu() {
   );
   $items['admin/galeria/import'] = array(
     'page callback' => 'drupal_get_form', 
-    'page arguments' => 'qft_pics_import_external_form', 
+    'page arguments' => array('qft_pics_import_external_form'), 
     'access arguments' => array('Access Pics Remotely'), 
     'type' => MENU_CALLBACK, 
   );
@@ -33,7 +33,7 @@ function qft_pics_menu_pics($node) {
   $styles = qft_pics_image_styles();
   foreach($styles as $style) {
     foreach($node->field_images[$node->language] as $pic) {
-      $pics[$style][] = image_style_url('style', $pic['uri']);
+      $pics[$style][] = image_style_url($style, $pic['uri']);
     }
   }
   header('Cache-Control: no-cache, must-revalidate');

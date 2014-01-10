@@ -2,7 +2,7 @@
 /**
  * Returns a drupal form that imports an external galery into a story node.
  */
-function qft_pics_import_external_form(&$form_state) {
+function qft_pics_import_external_form($form, &$form_state) {
   $form = array();
   $form['url'] = array(
     '#type' => 'textfield', 
@@ -18,4 +18,14 @@ function qft_pics_import_external_form(&$form_state) {
     ), 
   );
   return $form;
+}
+
+/**
+ * Process the submission of the form qft_pics_import_external_form.
+ */
+function qft_pics_import_external_form_submit($form, &$form_state) {
+  $url = $form_state['values']['url'];
+  $get = json_decode(qft_pics_curl_get($url));
+  print_r($get);
+  exit;
 }
