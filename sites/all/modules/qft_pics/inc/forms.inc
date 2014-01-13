@@ -94,10 +94,14 @@ function qft_pics_import_external_form_submit($form, &$form_state) {
 /**
  * Creates a drupal form for creating new remote gallery.
  */
-function qft_pics_create_remote_gallery($form, &$form_state) {
+function qft_pics_create_remote_gallery_form($form, &$form_state) {
   $external_site = variable_get('qft_pics-external_site_url', '');
   $action = "{$external_site}/admin/gallery/new/post";
   $form['#action'] = $action;
+  $form['key'] = array(
+    '#type' => 'hidden', 
+    '#value' => variable_get('qft_pics-access_key', md5('qft_pics-access_key')), 
+  );
   $form['title'] = array(
     '#type' => 'textfield', 
     '#title' => t('Title'), 
@@ -115,7 +119,7 @@ function qft_pics_create_remote_gallery($form, &$form_state) {
     '#required' => true, 
   );
   $form['pictures_zip'] = array(
-    '#type' => 'managed_file', 
+    '#type' => 'file', 
     '#title' => t('Zipped Pictures'), 
     '#required' => true, 
     '#upload_validators' => array(

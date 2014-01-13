@@ -18,9 +18,15 @@ function qft_pics_menu() {
     'access arguments' => array('Access Pics Remotely'), 
     'type' => MENU_CALLBACK, 
   );
+  $items['admin/gallery/import/%'] = array(
+    'page callback' => 'qft_pics_import_external_gallery_node', 
+    'page arguments' => array(3), 
+    'access arguments' => array('Access Pics Remotely'), 
+    'type' => MENU_CALLBACK, 
+  );
   $items['admin/gallery/new'] = array(
     'page callback' => 'drupal_get_form', 
-    'page arguments' => array('qft_pics_create_remote_gallery'), 
+    'page arguments' => array('qft_pics_create_remote_gallery_form'), 
     'access arguments' => array('Create A Remote Gallery'), 
     'type' => MENU_CALLBACK, 
   );
@@ -75,14 +81,90 @@ function qft_pics_menu_pics($node) {
 function qft_pics_menu_new_gallery_post() {
   // Validate Access
   if ( !isset($_POST['key']) ) {
-    return false;
+    drupal_set_message('Access Key not found.', 'error');
+    drupal_goto('<front>');
+    exit;
   }
   $access_key = variable_get('qft_pics-access_key', md5('qft_pics-access_key'));
   if ( $_POST['key'] != $access_key ) {
-    return false;
+    drupal_set_message('Access Key Invalid.', 'error');
+    drupal_goto('<front>');
+    exit;
   }
   
-  // Save post
-  print_r($_POST);
+  // Create node
+  if ( !($node = qft_pics_create_gallery_from_post($_POST)) ) {
+    drupal_set_message("Couldn't create the gallery.", 'error');
+    drupal_goto('<front>');
+    exit;
+  }
+  
+  // Return an Export of the node.
+  $url_back = "{$_SERVER['HTTP_ORIGIN']}/admin/gallery/import/{$node->nid}";
+  drupal_goto($url_back);
   exit;
+}
+
+/**
+ * Import
+ */
+function qft_pics_import_external_gallery_node($nid) {
+  $external_site = variable_get('qft_pics-external_site_url', '');
+  $key = variable_get('qft_pics-access_key', md5('qft_pics-access_key'));
+  $url = "{$external_site}/node/{$nid}/pics?key={$key}";
+  $get = json_decode(qft_pics_curl_get($url));
+  
+  // Build $Params.
+  global $user;
+  $params = array(
+    'title' => $get->title, 
+    'uid' => $user->uid, 
+    'status' => 1, 
+    'description' => $get->description, 
+    'pics' => array(), 
+  );
+  // Original
+  if ( isset($get->pics->src) && !empty($get->pics->src) ) {
+    foreach($get->pics->src as $pic) {
+      $params['pics']['field_picture_src'][] = $pic;
+    }
+  }
+  // Thumbnail
+  if ( isset($get->pics->thumbnail) && !empty($get->pics->thumbnail) ) {
+    foreach($get->pics->thumbnail as $pic) {
+      $params['pics']['field_picture_thumbnail'][] = $pic;
+    }
+  }
+  // Medium
+  if ( isset($get->pics->medium) && !empty($get->pics->medium) ) {
+    foreach($get->pics->medium as $pic) {
+      $params['pics']['field_picture_medium'][] = $pic;
+    }
+  }
+  // Large
+  if ( isset($get->pics->large) && !empty($get->pics->large) ) {
+    foreach($get->pics->large as $pic) {
+      $params['pics']['field_picture_large'][] = $pic;
+    }
+  }
+  // Evento Teaser
+  if ( isset($get->pics->evento_teaser) && !empty($get->pics->evento_teaser) ) {
+    foreach($get->pics->evento_teaser as $pic) {
+      $params['pics']['field_picture_evento_teaser'][] = $pic;
+    }
+  }
+  // Slider Home
+  if ( isset($get->pics->slider_home) && !empty($get->pics->slider_home) ) {
+    foreach($get->pics->slider_home as $pic) {
+      $params['pics']['field_picture_slider_home'][] = $pic;
+    }
+  }
+
+  if ( ($node = qft_pics_import_event($params)) ) {
+    // Notify
+    $link = l($node->title, 'node/' . $node->nid);
+    $message = t('El evento !event_link ha sido importado exitosamente.', array('!event_link' => $link));
+    drupal_set_message($message);
+    drupal_goto('node/' . $node->nid);
+  }
 }
