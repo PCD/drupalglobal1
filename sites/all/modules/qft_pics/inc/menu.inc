@@ -52,8 +52,12 @@ function qft_pics_menu_pics($node) {
   $response = array(
     'title' => trim($node->title), 
     'description' => '', 
+    'lugar' => null, 
     'pics' => array(), 
   );
+  if ( isset($node->field_lugar[$node->language][0]['tid']) ) {
+    $response['lugar'] = $node->field_lugar[$node->language][0]['tid'];
+  }
   if ( isset($node->body[$node->language][0]['safe_value']) ) {
     $response['description'] = trim($node->body[$node->language][0]['safe_value']);
   }
@@ -123,6 +127,10 @@ function qft_pics_import_external_gallery_node($nid) {
     'description' => $get->description, 
     'pics' => array(), 
   );
+  // Taxonomy
+  if ( isset($get->lugar) && !is_null($get->lugar) ) {
+    $params['lugar'] = $get->lugar;
+  }
   // Original
   if ( isset($get->pics->src) && !empty($get->pics->src) ) {
     foreach($get->pics->src as $pic) {

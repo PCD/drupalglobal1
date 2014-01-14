@@ -16,6 +16,7 @@ function qft_pics_image_styles() {
  * Creates an event out of an import.
  * @param ARRAY $params An array with the following index values.
  * uid => user id of the User contacting the doctor.
+ * lugar => A field lugar term id.
  * pics => An array of arrays of grouped pictures.
  * description => The message body.
  * status => The status of the message.
@@ -30,6 +31,11 @@ function qft_pics_import_event($params) {
   $node->title = $params['title'];
   $node->language = LANGUAGE_NONE;
   $node->uid = $params['uid'];
+  
+  // Taxonomy
+  if ( isset($params['lugar']) ) {
+    $node->field_lugar[$node->language][0]['tid'] = $params['lugar'];
+  }
   
   // GENERAL
   $node->body[$node->language][0]['value'] = $params['description'];
