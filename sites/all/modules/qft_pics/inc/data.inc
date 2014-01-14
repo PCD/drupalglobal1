@@ -64,7 +64,12 @@ function qft_pics_import_event($params) {
  */
 function qft_pics_create_gallery_from_post($params) {
   // Save and get file.
-  $file = qft_pics_save_file_from_gallery_post();
+  try{
+    $file = qft_pics_save_file_from_gallery_post();
+  } catch (Exception $e) {
+    drupal_set_message($e->getMessage(), 'error');
+    return false;
+  }
   
   // Create node
   $node = new stdClass();
