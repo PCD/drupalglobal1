@@ -118,7 +118,8 @@ function qft_pics_save_file_from_gallery_post() {
   $handle = fopen($_FILES['files']['tmp_name']['pictures_zip'], 'r');
   $name = $_FILES['files']['name']['pictures_zip'];
   $folder = time();
-  $file = file_save_data($handle, "public://{$folder}-{$name}");
+  $new_name = preg_replace('/[^a-z0-9-_\.]/msi', '', $name);
+  $file = file_save_data($handle, "public://{$folder}-{$new_name}");
   fclose($handle);
   return $file;
 }
