@@ -102,6 +102,16 @@ function qft_pics_create_remote_gallery_form($form, &$form_state) {
     '#type' => 'hidden', 
     '#value' => variable_get('qft_pics-access_key', md5('qft_pics-access_key')), 
   );
+  $form['place'] = array(
+    '#type' => 'select', 
+    '#title' => t('Place'), 
+    '#options' => array(), 
+    '#required' => true, 
+  );
+  $places = taxonomy_get_tree(2);
+  foreach($places as $place) {
+    $form['place']['#options'][$place->tid] = check_plain($place->name);
+  }
   $form['title'] = array(
     '#type' => 'textfield', 
     '#title' => t('Title'), 

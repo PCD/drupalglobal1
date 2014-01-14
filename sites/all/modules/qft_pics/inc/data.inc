@@ -75,6 +75,7 @@ function qft_pics_create_gallery_from_post($params) {
   $node->body[$node->language][0]['value'] = $params['body'];
   $node->body[$node->language][0]['format'] = 'filtered_html';
   $node->created = strtotime("{$params['date']['year']}/{$params['date']['month']}/{$params['date']['day']}");
+  $node->field_lugar[$node->language][0]['tid'] = $params['place'];
   
   // Attach File
   $file->display = 1;
