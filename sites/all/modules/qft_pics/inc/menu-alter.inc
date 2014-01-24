@@ -26,13 +26,17 @@ function qft_pics_menu_galeria_page_view($node) {
   $output = '';
   
   // Build Galeria
+  drupal_add_js(drupal_get_path('module', 'qft_pics') . '/js/jquery.jcarousel.js');
+  drupal_add_js(drupal_get_path('module', 'qft_pics') . '/js/node-gallery.js');
   if ( isset($node->field_picture_evento_teaser[$node->language]) && isset($node->field_picture_large[$node->language]) ) {
     $teasers = $node->field_picture_evento_teaser[$node->language];
     $bigs = $node->field_picture_large[$node->language];
-    $output = "";
+    $output = "<div id=\"quienfalto-gallery\">\n<ul>\n";
     foreach($teasers as $key => $teaser) {
-      $output .= "<a class=\"colorbox\" rel=\"galeria\" href=\"{$bigs[$key]['url']}\"><img src=\"{$teaser['url']}\" /></a>\n";
+      $output .= "<img src=\"{$bigs[$key]['url']}\" /> \n";
+      //$output .= "<li><a class=\"colorbox\" rel=\"galeria\" href=\"{$bigs[$key]['url']}\"><img src=\"{$teaser['url']}\" /></a>\n";
     }
+    $output .= "</ul>\n</div>\n";
     drupal_add_js(drupal_get_path('module', 'colorbox') . '/js/colorbox.js');
   }
   
