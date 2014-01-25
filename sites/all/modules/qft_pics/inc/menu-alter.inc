@@ -28,16 +28,25 @@ function qft_pics_menu_galeria_page_view($node) {
   // Build Galeria
   drupal_add_js(drupal_get_path('module', 'qft_pics') . '/js/jquery.jcarousel.js');
   drupal_add_js(drupal_get_path('module', 'qft_pics') . '/js/node-gallery.js');
+  drupal_add_css(drupal_get_path('module', 'qft_pics') . '/css/jcarousel.connected-carousels.css');
   if ( isset($node->field_picture_evento_teaser[$node->language]) && isset($node->field_picture_large[$node->language]) ) {
-    $teasers = $node->field_picture_evento_teaser[$node->language];
+    $thumbnails = $node->field_picture_thumbnail[$node->language];
     $bigs = $node->field_picture_large[$node->language];
-    $output = "<div id=\"quienfalto-gallery\">\n<ul>\n";
-    foreach($teasers as $key => $teaser) {
-      $output .= "<img src=\"{$bigs[$key]['url']}\" /> \n";
-      //$output .= "<li><a class=\"colorbox\" rel=\"galeria\" href=\"{$bigs[$key]['url']}\"><img src=\"{$teaser['url']}\" /></a>\n";
+    
+    // Theme Gallery
+    $navigation = $pictures = '';
+    foreach($thumbnails as $key => $thumbnail) {
+      $pictures .= "<li><img src=\"{$bigs[$key]['url']}\" width=\"691\" height=\"396\" /></li>\n";
+      $navigation .= "<li><img src=\"{$thumbnail['url']}\" width=\"50\" height=\"50\" /></li>\n";
     }
-    $output .= "</ul>\n</div>\n";
-    drupal_add_js(drupal_get_path('module', 'colorbox') . '/js/colorbox.js');
+    $pictures = theme('qft_pics-node_gallery-pictures', array('pictures'=>$pictures));
+    $navigation = theme('qft_pics-node_gallery-navigation', array('pictures'=>$navigation));
+    $output = theme('qft_pics-node_gallery', array(
+      'pictures' => $pictures, 
+      'navigation' => $navigation, 
+      'url' => url('node/' . arg(1), array('absolute'=>TRUE)), 
+    ));
+    //drupal_add_js(drupal_get_path('module', 'colorbox') . '/js/colorbox.js');
   }
   
   return $output;
