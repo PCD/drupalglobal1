@@ -78,7 +78,8 @@ function google_fonts_admin_settings_form($form, &$form_state) {
       }
       else {
         // Get the first variant (array_shift) to be selected as default
-        $enabled_fonts[$key]['variants'] = array(array_shift(_google_fonts_admin_array_values($font->variants)));
+        $item = array_shift(_google_fonts_admin_array_values($font->variants));
+        $enabled_fonts[$key]['variants'] = array($item);
       }
 
       $enabled_fonts[$key]['subsets'] = isset($enabled_fonts[$key]['subsets']) ? (array) $enabled_fonts[$key]['subsets'] : array(key(_google_fonts_admin_array_values($font->subsets)));
@@ -116,7 +117,9 @@ function google_fonts_admin_settings_form($form, &$form_state) {
     }
     
     // Fetch the first family name (using array_shift) to include it in the example CSS code
-    $first_family = $form_options['enabled'][array_shift(array_keys($form_options['enabled']))]->family;
+    $array_keys = array_keys($form_options['enabled']);
+    $last_key = array_shift($array_keys);
+    $first_family = $form_options['enabled'][$last_key]->family;
     $form['google_fonts_fieldset_enabled_fonts']['css_code'] = array(
       '#type' => 'textarea',
       '#title' => t('CSS code'),
