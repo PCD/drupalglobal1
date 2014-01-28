@@ -37,7 +37,7 @@ function qft_pics_menu_galeria_page_view($node) {
     $navigation = $pictures = '';
     foreach($thumbnails as $key => $thumbnail) {
       $pictures .= "<li><img src=\"{$bigs[$key]['url']}\" width=\"691\" height=\"396\" /></li>\n";
-      $navigation .= "<li><img src=\"{$thumbnail['url']}\" width=\"50\" height=\"50\" /></li>\n";
+      $navigation .= "<li><img src=\"{$thumbnail['url']}\" width=\"100\" height=\"100\" /></li>\n";
     }
     $pictures = theme('qft_pics-node_gallery-pictures', array('pictures'=>$pictures));
     $navigation = theme('qft_pics-node_gallery-navigation', array('pictures'=>$navigation));

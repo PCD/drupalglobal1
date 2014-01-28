@@ -55,7 +55,7 @@
 /** Navigation carousel specific styles **/
 
 .connected-carousels .carousel-navigation {
-    height: 50px;
+    height: 100px;
     width: auto;
     box-sizing: content-box;
     background: #fff;
@@ -163,13 +163,13 @@
 
 .connected-carousels .prev-navigation {
     left: -15px;
-    top: 22px;
+    top: 44px;
     text-indent: 6px;
 }
 
 .connected-carousels .next-navigation {
     right: -15px;
-    top: 22px;
+    top: 44px;
     text-indent: 20px;
 }
 
