@@ -32,6 +32,9 @@
  */
 function domain_variable_language_init() {
   $realm = variable_realm_controller('domain');
+  $store = $realm->getCurrentStore();
+  // Make sure that there is a valid store, @see https://drupal.org/node/2029191
+  if (!$store) return;
   // Only proceed if 'language_default' is configured as a domain variable.
   if (in_array('language_default', $realm->getEnabledVariables())) {
     $languages = language_list('language');
@@ -41,7 +44,7 @@ function domain_variable_language_init() {
     if ($language_default->javascript != $languages[$language_default->language]->javascript) {
       // Update stored value, then refresh runtime value.
       $language_default->javascript = $languages[$language_default->language]->javascript;
-      $realm->getCurrentStore()->variable_set('language_default', $language_default);
+      $store->variable_set('language_default', $language_default);
       variable_realm_refresh('domain', $realm->getKey(), 'language_default');
     }
   }

@@ -5,9 +5,9 @@ dependencies[] = domain
 core = 7.x
 stylesheets[all][] = domain_nav.css
 
-; Information added by drupal.org packaging script on 2013-06-02
-version = "7.x-3.10"
+; Information added by  packaging script on 2013-12-04
+version = "7.x-3.10+10-dev"
 core = "7.x"
 project = "domain"
-datestamp = "1370207153"
+datestamp = "1386182910"
 
