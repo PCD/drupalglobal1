@@ -61,7 +61,7 @@ function fboauth_schema() {
  * Implements hook_schema_alter()
  */
 function fboauth_schema_alter(&$schema) {
-  $schema['users']['fields']['mail']['length'] = 320;
+  //$schema['users']['fields']['mail']['length'] = 320;
 }
 
 /**
