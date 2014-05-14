@@ -10,6 +10,8 @@ sites/*/.DS_Store
 # Ignore some Sites
 sites/corasdeportivotepic.mx
 sites/drupal.diarioindependencia.com
+sites/local.asiganalagente.com
+sites/www.asiganalagente.com
 sites/tepicnay.mx
 sites/m.tepicnay.mx
 sites/default
