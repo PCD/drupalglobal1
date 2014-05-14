@@ -190,6 +190,9 @@ function fboauth_field_convert_list($facebook_property_name, $fbuser, $field, $i
  */
 function fboauth_field_convert_date($facebook_property_name, $fbuser, $field, $instance) {
   $value = NULL;
+  if ( !isset($fbuser->$facebook_property_name) ) {
+    return false;
+  }
   $fbdate = explode('/', $fbuser->$facebook_property_name);
   if (count($fbdate) == 3) {
     $date = new DateObject($fbuser->$facebook_property_name);

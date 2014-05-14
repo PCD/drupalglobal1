@@ -7,6 +7,8 @@ cache
 */.DS_Store
 sites/*/.DS_Store
 
+feria.jpg
+nayarit1.mp3
 # Ignore some Sites
 sites/corasdeportivotepic.mx
 sites/drupal.diarioindependencia.com
@@ -16,8 +18,12 @@ sites/www.asiganalagente.com
 sites/tepicnay.mx
 sites/m.tepicnay.mx
 sites/default
+sites/sdgtv.com
 sites/local.facebook.com
 sites/socialapps.mx
+sites/local.tepicnay.mx
+sites/xn--sealdelagente-jkb.com.tar.gz
+sites/xn--sealdelagente-jkb.com
 sites/www.socialapps.mx
 sites/eldiariodenayarit.com
 sites/quienfalto.com
