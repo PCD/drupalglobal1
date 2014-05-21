@@ -9,14 +9,5 @@ function asiganacustom_permission() {
       'description' => 'Subir Galerias a cualquier Candidato', 
     ), 
   );
-  /*
-  $candidatos = taxonomy_get_tree(2);
-  foreach($candidatos as $term) {
-    $permissions["post-gallery-candidato-{$term->tid}"] = array(
-      'title' => 'Subir Galerias al Candidato ' . $term->name, 
-      'description' => 'Subir Galerias al Candidato ' . $term->name, 
-    );
-  }
-  */
   return $permissions;
 }
