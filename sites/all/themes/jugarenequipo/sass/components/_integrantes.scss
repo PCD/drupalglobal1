@@ -1,0 +1,48 @@
+
+.view-el-equipo{
+
+	width: 1200px ;
+	margin: 100px auto ;
+
+	.group-left, .group-right{
+		background: rgba(0,0,0,0.5) ;
+		width: 100% ;
+		margin: 0 auto ; 
+		paddin: 0px 200px;
+ 	}
+
+
+	.group-left{
+		width: 600px ;
+
+	}
+	.group-right{
+		width: 600px ;
+		color: #fff ;
+		padding-top: 140px;
+		height: 450px;
+	}
+
+	.group-header{
+		background: none ;
+		color: #fff ;
+		font-size: 85px ;
+		margin-bottom: 45px ;
+	}
+
+	.views-slideshow-controls-top{
+		display: block ;
+		position: absolute ;
+		margin-top: 400px ; 
+	}
+
+	.views_slideshow_controls_text_pause{
+		display: none ;
+	}
+	.views_slideshow_controls_text_next{
+		float: right;
+		position: absolute;
+		margin-left: 1100px;
+	}
+
+}
