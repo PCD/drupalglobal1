@@ -1,0 +1,33 @@
+body.page-resultados{
+	h1{
+		color: $rojo_base ;
+		font-size: 110px ;
+		font-weight:100;
+	}	
+}
+
+.view-id-resultados{
+	width: 1200px ;
+	margin: 0 auto ;
+	.group-left{
+		width: 600px;
+	}
+
+	.group-right{
+		width: 600px;
+		padding-left: 100px ;
+		padding-right: 100px ;
+		text-align: left ;
+		h2{  
+			color: #fff ;
+			text-shadow: 2px 2px 2px #000 ;
+			font-size: 45px ;
+			margin:0px;
+		}
+
+		p{
+			color: #fff ;
+			font-size: 25px ;
+		}
+	}
+}
