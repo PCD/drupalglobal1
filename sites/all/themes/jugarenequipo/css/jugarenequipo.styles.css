@@ -17,33 +17,53 @@ body {
     font-size: 75px;
     text-shadow: 3px 3px 2px black;
     font-weight: 100; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000316}}
+  body .balon {
+    position: absolute;
+    z-index: -1000;
+    margin-top: -5%;
+    margin-left: -50%;
+    width: 40%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000324}}
+  body .equipo {
+    margin-top: 5%;
+    width: 50%;
+    margin-right: -30%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000330}}
+  body .alianza {
+    width: 5%;
+    margin-right: -75%; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000319}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000339}}
+.front .l-content h1 {
+  display: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000345}}
 #block-system-main-menu {
   text-align: center; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000321}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000347}}
   #block-system-main-menu h2 {
     display: none; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000325}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000351}}
   #block-system-main-menu ul {
     max-width: 1200px;
     margin: 0 auto;
     padding-left: 0px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000331}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000357}}
   #block-system-main-menu ul li {
     display: inline-block;
     margin-right: 30px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000336}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000362}}
   #block-system-main-menu a {
     text-decoration: none;
     color: white;
     font-size: 25px;
     text-shadow: 4px 4px 4px black; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000343}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000369}}
   #block-system-main-menu a:hover {
     border-bottom: solid #f20303 3px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000355}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000381}}
 footer {
   background: #f20303;
   position: absolute;
@@ -53,35 +73,35 @@ footer {
   margin-top: 5%;
   padding-top: 5px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000365}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000391}}
 .footer {
   color: white; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000368}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000394}}
   .footer p {
     font-size: 30px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000372}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000398}}
   .footer ul {
     float: right;
     margin-right: 30%;
     margin-top: -65px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000378}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\00003104}}
   .footer ul li {
     list-style: none;
     display: inline-block; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000383}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\00003109}}
   .footer ul li a {
     width: 40px;
     height: 40px;
     display: block;
     padding: 10px;
     margin-right: 5px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000392}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\00003118}}
   .footer ul li a.fb {
     background: url("../images/fb.jpg") no-repeat center center; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000395}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\00003121}}
   .footer ul li a.tw {
     background: url("../images/tw.jpg") no-repeat center center; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\0000398}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_basics\.scss}line{font-family:\00003124}}
   .footer ul li a.yt {
     background: url("../images/yt.jpg") no-repeat center center; }
 

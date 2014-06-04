@@ -12,7 +12,33 @@ body{
 		text-shadow: 3px 3px 2px #000 ;	
 		font-weight:100;
 	}
+
+	.balon{
+		position: absolute ;
+		z-index:-1000;
+		margin-top: -5%;
+		margin-left: -50%;
+		width: 40%;
+	}
+
+	.equipo{
+		margin-top: 5%;
+		width: 50%;
+		margin-right: -30%;
+	}
+
+	.alianza{
+		width: 5% ;
+		margin-right: -75%;
+
+	}
+
+	
 }
+
+.front .l-content h1{
+		display: none ;
+	}
 
 
 
