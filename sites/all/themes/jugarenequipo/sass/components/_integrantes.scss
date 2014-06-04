@@ -5,7 +5,7 @@
 	margin: 100px auto ;
 
 	.group-left, .group-right{
-		background: rgba(0,0,0,0.5) ;
+		background: rgba(0,0,0,0.4) ;
 		width: 100% ;
 		margin: 0 auto ; 
 		paddin: 0px 200px;
@@ -19,8 +19,15 @@
 	.group-right{
 		width: 600px ;
 		color: #fff ;
+		font-size: 30px ;
 		padding-top: 140px;
 		height: 450px;
+		div{
+			margin-bottom: 10px ;
+		}
+		.field__items h2{
+			margin-top: -10px ;
+		}
 	}
 
 	.group-header{
@@ -28,21 +35,37 @@
 		color: #fff ;
 		font-size: 85px ;
 		margin-bottom: 45px ;
+		font-size: 85px ;
+		text-shadow: 3px 3px 2px #000 ;
 	}
 
 	.views-slideshow-controls-top{
 		display: block ;
 		position: absolute ;
-		margin-top: 400px ; 
+		margin-top: 138px ;
+		padding-top: 192px ;
+		padding-bottom: 255px ;
+		padding-right: 249px ;
+		margin-left: -250px ; 
+		height:450px;
+		text-indent:-9000px;
+		background: url("../images/arrow_left.jpg") no-repeat center center, rgba(0,0,0,0.4)  ;
 	}
 
 	.views_slideshow_controls_text_pause{
 		display: none ;
 	}
 	.views_slideshow_controls_text_next{
-		float: right;
-		position: absolute;
-		margin-left: 1100px;
+		display: block ;
+		position: absolute ;
+		margin-top: -210px ;
+		padding-top: 192px ;
+		padding-bottom: 255px ;
+		padding-left: 205px ;
+		height:450px;
+		margin-left: 1450px;
+		text-indent:-9000px;
+		background: url("../images/arrow_right.jpg") no-repeat center center, rgba(0,0,0,0.4)  ;
 	}
 
 }
