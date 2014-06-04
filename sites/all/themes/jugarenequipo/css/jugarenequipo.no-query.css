@@ -108,18 +108,19 @@ footer {
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\000032}}
 body.section-descargas h1 {
   font-size: 110px;
-  color: #f20303; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\000037}}
+  color: #f20303;
+  margin-top: 20px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\000038}}
 body.section-descargas ul.descargas {
-  width: 1200px;
+  width: 1300px;
   text-align: center;
   margin: 0 auto; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\0000313}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\0000314}}
 body.section-descargas ul.descargas li {
   list-style: none;
   display: inline-block;
   margin-right: 40px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\0000319}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_descargas\.scss}line{font-family:\0000320}}
 body.section-descargas ul.descargas li a img {
   width: 300px;
   height: auto; }
@@ -191,28 +192,33 @@ body.page-integrantes-del-equipo h1 {
   font-size: 110px;
   width: 450px;
   text-align: left;
-  margin: 15px auto;
-  font-weight: 1000;
-  padding-bottom: 80px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000311}}
+  margin: 0 auto;
+  font-weight: 1000; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000310}}
 body.page-integrantes-del-equipo ul {
   text-align: center; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000315}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000314}}
 body.page-integrantes-del-equipo ul li {
   list-style: none;
   display: inline-block;
   margin-right: 100px;
   margin-bottom: 130px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000322}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000321}}
 body.page-integrantes-del-equipo ul li a {
   text-decoration: none;
   color: white;
   text-shadow: 4px 4px 3px black;
   font-size: 45px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000329}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000328}}
 body.page-integrantes-del-equipo .view-integrantes-del-equipo {
   width: 1200px;
   margin: 0 auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000333}}
+body.page-integrantes-del-equipo .field--name-field-fb-candidato img {
+  float: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\0000338}}
+body.page-integrantes-del-equipo .field--name-field-tw-candidato img {
+  float: left; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\000032}}
 body.page-propuestas h1 {

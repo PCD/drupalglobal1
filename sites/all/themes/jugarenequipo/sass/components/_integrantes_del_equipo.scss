@@ -3,9 +3,8 @@ body.page-integrantes-del-equipo{
 		font-size: 110px ;
 		width: 450px;
 		text-align: left;
-		margin: 15px auto ;
+		margin: 0 auto ;
 		font-weight:1000;
-		padding-bottom: 80px ;
 	} 
 
 	ul{
@@ -31,5 +30,13 @@ body.page-integrantes-del-equipo{
 		margin: 0 auto ;
 	}
 
+	.field--name-field-fb-candidato img{
+		float: left ;
+
+	}
+
+	.field--name-field-tw-candidato img{
+		float: left ;
+	}
 }
 
