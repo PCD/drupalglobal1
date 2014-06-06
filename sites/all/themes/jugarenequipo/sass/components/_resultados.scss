@@ -3,31 +3,79 @@ body.page-resultados{
 		color: $rojo_base ;
 		font-size: 110px ;
 		font-weight:100;
+		margin: 0px ;
+		padding-top: 10px ;
+		padding-bottom: 10px ;
 	}	
 }
 
 .view-id-resultados{
 	width: 1200px ;
 	margin: 0 auto ;
-	.group-left{
+
+	img{
 		width: 600px;
+		height: auto;
+		float: left;
+		margin-top: 50px;
 	}
 
-	.group-right{
-		width: 600px;
-		padding-left: 100px ;
-		padding-right: 100px ;
-		text-align: left ;
-		h2{  
-			color: #fff ;
-			text-shadow: 2px 2px 2px #000 ;
-			font-size: 45px ;
-			margin:0px;
-		}
+	 a{
+		font-size: 70px;
+		text-decoration: none ;
+		color: #fff ;
 
-		p{
-			color: #fff ;
-			font-size: 25px ;
-		}
+	}
+
+	p{
+
+		font-size: 40px ;
+		color: #fff ;
+		text-align: left ;
+		width: 500px;
+		float: right;
+		display: block ;
+		margin-left: 650px;
+		margin-top: -350px;
+	}
+
+	.widget_pager_bottom_resultados-page{
+
+		width: 1200px ;
+		text-align: center ;
+
+
+	}
+
+	.views-slideshow-controls-bottom{
+		text-align: center ;
+		margin-top: -150px ;
+		width: 800px ;
+		margin-left: 200px ;
+	}
+
+	.views-slideshow-controls-bottom .views-content-counter{
+		 background-color: #fff; 
+		 border-radius: 25px ; 
+		 float: left; 
+		 height: 40px; 
+		 width: 40px; 
+		 margin-right: 15px; 
+		 color: #fff ;
+		 text-indent: - 9999px; 
+		 cursor: pointer; 
+
+	}
+
+	.views-slideshow-controls-bottom .active .views-content-counter{
+		background-color: red ;
+		height: 60px; 
+		width: 60px; 
+		border-radius: 35px ; 
+		margin-right: 15px; 
+		color: red ;
+		text-indent: - 9999px; 
+		cursor: pointer; 
+		float: left; 
 	}
 }

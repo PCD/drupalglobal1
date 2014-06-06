@@ -25,18 +25,14 @@ body.page-integrantes-del-equipo{
 		font-size: 45px ;		
 	}
 
-	.view-integrantes-del-equipo{
-		width: 1200px ;
-		margin: 0 auto ;
-	}
-
-	.field--name-field-fb-candidato img{
-		float: left ;
+	#views_slideshow_cycle_main_resultados-page .views-field-title,.views-field-title{
+		width: 600px ;
+		text-align: left ;
 
 	}
 
-	.field--name-field-tw-candidato img{
-		float: left ;
+	#views_slideshow_cycle_main_resultados-page .views-field .views-field-field-imagen-resultado img{
+		width: 600px ;
 	}
 }
 

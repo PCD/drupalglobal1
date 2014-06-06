@@ -1,7 +1,6 @@
 body{
 	background: url("../images/fondo.jpg") ;
 	text-align: center ;
-	height: 1500pxs ;
 	.breadcrumb{ 
 		display: none ;
 	}
@@ -49,9 +48,10 @@ body{
 	}
 
 	ul{
-		max-width: 1200px ;
+		width: 1200px ;
 		margin: 0 auto ;
 		padding-left: 0px ;
+		text-align: center ;
 	}
 
 	ul li {

@@ -22,6 +22,7 @@
 		font-size: 30px ;
 		padding-top: 140px;
 		height: 450px;
+		text-align: left ;
 		div{
 			margin-bottom: 10px ;
 		}
@@ -34,9 +35,36 @@
 		background: none ;
 		color: #fff ;
 		font-size: 85px ;
-		margin-bottom: 45px ;
+		margin-bottom: 25px ;
+		margin-top: -20px ;
 		font-size: 85px ;
 		text-shadow: 3px 3px 2px #000 ;
+	}
+
+
+	.group-right .field--label-hidden{
+		display: inline-block ;
+		margin-right: 20px ;
+		margin-top: 10px ;
+		text-align: left ;
+	}
+
+	.view-integrantes-del-equipo{
+		width: 1200px ;
+		margin: 0 auto ;
+	}
+
+	.view-id-el_equipo .field--name-field-fb-candidato img{
+		float: left ;
+		display: block ;
+		margin-top: 20px ;
+
+	}
+
+	.view-id-el_equipo .field--name-field-tw-candidato img{
+		float: left ;
+		display: block ;
+		margin-top: 20px ;
 	}
 
 	.views-slideshow-controls-top{
