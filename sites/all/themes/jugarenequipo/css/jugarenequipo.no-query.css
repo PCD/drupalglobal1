@@ -182,32 +182,38 @@ body.section-descargas ul.descargas li a img {
     display: block;
     margin-top: 20px; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000370}}
-  .view-el-equipo .views-slideshow-controls-top {
-    display: block;
-    position: absolute;
-    margin-top: 138px;
-    padding-top: 192px;
-    padding-bottom: 255px;
-    padding-right: 249px;
-    margin-left: -250px;
-    height: 450px;
-    text-indent: -9000px;
-    background: url("../images/arrow_left.jpg") no-repeat center center, rgba(0, 0, 0, 0.4); }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000383}}
-  .view-el-equipo .views_slideshow_controls_text_pause {
+  .view-el-equipo #views_slideshow_controls_text_pause_el_equipo-page a {
     display: none; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000386}}
-  .view-el-equipo .views_slideshow_controls_text_next {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000374}}
+  .view-el-equipo #views_slideshow_controls_text_previous_el_equipo-page {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
     display: block;
-    position: absolute;
-    margin-top: -210px;
-    padding-top: 192px;
-    padding-bottom: 255px;
-    padding-left: 205px;
-    height: 450px;
-    margin-left: 1450px;
-    text-indent: -9000px;
-    background: url("../images/arrow_right.jpg") no-repeat center center, rgba(0, 0, 0, 0.4); }
+    text-indent: -9999px;
+    margin-left: -90px;
+    margin-top: -270px;
+    margin-bottom: 250px;
+    background: white;
+    transition: 0.3s; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000387}}
+  .view-el-equipo #views_slideshow_controls_text_previous_el_equipo-page:hover {
+    background: url("../images/derecha.png") no-repeat center center, red; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000391}}
+  .view-el-equipo #views_slideshow_controls_text_next_el_equipo-page {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    text-indent: -9999px;
+    display: block;
+    margin-left: 1210px;
+    margin-top: -330px;
+    margin-bottom: 250px;
+    background: white;
+    transition: 0.3s; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\00003104}}
+  .view-el-equipo #views_slideshow_controls_text_next_el_equipo-page:hover {
+    background: url("../images/derecha.png") no-repeat center center, red; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes_del_equipo\.scss}line{font-family:\000032}}
 body.page-integrantes-del-equipo h1 {
