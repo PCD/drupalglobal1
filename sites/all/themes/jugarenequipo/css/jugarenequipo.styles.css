@@ -125,6 +125,30 @@ body.section-descargas ul.descargas li a img {
   width: 300px;
   height: auto; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galeria\.scss}line{font-family:\000032}}
+.node-type-galeria h1 {
+  margin: 10px auto;
+  color: #f20303; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galeria\.scss}line{font-family:\000037}}
+.node-type-galeria .field--name-field-imagenes-galerias {
+  width: 1160px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 30px 0px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galeria\.scss}line{font-family:\0000312}}
+  .node-type-galeria .field--name-field-imagenes-galerias .field__item {
+    display: inline-block;
+    margin-right: 30px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galeria\.scss}line{font-family:\0000319}}
+.node-type-galeria .field--name-body {
+  width: 1100px;
+  margin: 0 auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galeria\.scss}line{font-family:\0000322}}
+  .node-type-galeria .field--name-body p {
+    color: #fff;
+    font-size: 40px;
+    text-shadow: 2px 2px 2px black; }
+
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\000032}}
 .view-id-galerias ul {
   width: 1200px;
