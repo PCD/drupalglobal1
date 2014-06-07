@@ -159,28 +159,29 @@ body.section-descargas ul.descargas li a img {
   display: inline-block;
   width: 295px;
   background: white;
-  color: #f20303;
   margin-right: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.9);
   border-radius: 5px;
   margin-top: 20px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\0000317}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\0000316}}
 .view-id-galerias ul li p {
   width: 280px;
   margin: 10px auto;
   text-align: left;
   color: #090909;
   font-size: 20px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\0000326}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\0000325}}
 .view-id-galerias ul li img {
   width: 280px;
   height: auto;
   margin: 10px auto; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\0000332}}
-.view-id-galerias ul li h2 {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_galerias\.scss}line{font-family:\0000331}}
+.view-id-galerias ul li h2 a {
   width: 280px;
   margin: 10px auto;
   font-size: 30px;
+  color: #f20303;
+  text-decoration: none;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9); }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\000032}}
@@ -256,7 +257,7 @@ body.section-descargas ul.descargas li a img {
     transition: 0.3s; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000387}}
   .view-el-equipo #views_slideshow_controls_text_previous_el_equipo-page:hover {
-    background: url("../images/derecha.png") no-repeat center center, red; }
+    background: url("../images/izquierda.png") no-repeat center center, red; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_integrantes\.scss}line{font-family:\0000391}}
   .view-el-equipo #views_slideshow_controls_text_next_el_equipo-page {
     width: 80px;
@@ -341,61 +342,81 @@ body.page-resultados h1 {
   margin: 0px;
   padding-top: 10px;
   padding-bottom: 10px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000310}}
+body.page-resultados h2 {
+  color: white;
+  text-shadow: 3px 3px 4px rgba(0, 0, 0, 0.8);
+  font-size: 50px;
+  margin: 5px auto;
+  text-align: center; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000312}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000319}}
 .view-id-resultados {
   width: 1200px;
   margin: 0 auto; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000316}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000323}}
   .view-id-resultados img {
     width: 600px;
     height: auto;
     float: left;
     margin-top: 50px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000323}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000330}}
   .view-id-resultados a {
-    font-size: 70px;
     text-decoration: none;
     color: white; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000330}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000336}}
   .view-id-resultados p {
-    font-size: 40px;
+    font-size: 30px;
     color: white;
     text-align: left;
     width: 500px;
     float: right;
     display: block;
-    margin-left: 650px;
-    margin-top: -350px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000342}}
+    margin: 5px auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000347}}
   .view-id-resultados .widget_pager_bottom_resultados-page {
     width: 1200px;
     text-align: center; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000350}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000355}}
   .view-id-resultados .views-slideshow-controls-bottom {
     text-align: center;
-    margin-top: -150px;
-    width: 800px;
-    margin-left: 200px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000357}}
-  .view-id-resultados .views-slideshow-controls-bottom .views-content-counter {
-    background-color: #fff;
-    border-radius: 25px;
-    float: left;
-    height: 40px;
-    width: 40px;
-    margin-right: 15px;
-    color: white;
-    text-indent: -9999px;
-    cursor: pointer; }
+    margin: 0px 400px 0 400px;
+    width: 400px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000361}}
+  .view-id-resultados #views_slideshow_controls_text_resultados-page span {
+    display: inline-block;
+    margin-right: 25px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000366}}
+  .view-id-resultados #views_slideshow_controls_text_pause_resultados-page a {
+    display: none; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000370}}
-  .view-id-resultados .views-slideshow-controls-bottom .active .views-content-counter {
-    background-color: red;
-    height: 60px;
-    width: 60px;
-    border-radius: 35px;
-    margin-right: 15px;
-    color: red;
+  .view-id-resultados #views_slideshow_controls_text_previous_resultados-page {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    display: block;
     text-indent: -9999px;
-    cursor: pointer;
-    float: left; }
+    background: white;
+    transition: 0.3s; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000380}}
+  .view-id-resultados #views_slideshow_controls_text_previous_resultados-page:hover {
+    background: url("../images/izquierda.png") no-repeat center center, red; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000384}}
+  .view-id-resultados #views_slideshow_controls_text_next_resultados-page {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    text-indent: -9999px;
+    display: block;
+    background: white;
+    transition: 0.3s; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000394}}
+  .view-id-resultados #views_slideshow_controls_text_next_resultados-page:hover {
+    background: url("../images/derecha.png") no-repeat center center, red; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000398}}
+  .view-id-resultados #views_slideshow_slide_counter_resultados-page {
+    display: block;
+    color: white;
+    width: 100px;
+    margin: 0 auto;
+    font-size: 30px; }
