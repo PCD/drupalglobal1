@@ -10,10 +10,13 @@ sites/*/.DS_Store
 feria.jpg
 nayarit1.mp3
 # Ignore some Sites
+sites/local.enequipo.com
 sites/corasdeportivotepic.mx
 sites/drupal.diarioindependencia.com
 sites/local.cambox.com
 sites/local.asiganalagente.com
+sites/www.jugarenequipo.mx
+sites/jugarenequipo.mx
 sites/local.casas.com
 sites/www.cambox.mx
 sites/www.asiganalagente.com
