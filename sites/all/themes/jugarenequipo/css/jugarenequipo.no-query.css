@@ -357,6 +357,9 @@ body.page-propuestas h1 {
   padding-top: 40px;
   padding-bottom: 80px;
   margin-bottom: -90px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000361}}
+  .node-type-propuesta #block-facebook-comments-box-facebook-comments-box h2 {
+    display: none; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\000032}}
 body.page-resultados h1 {
