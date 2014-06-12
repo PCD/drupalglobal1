@@ -418,8 +418,8 @@ body.page-resultados h2 {
     display: none; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000370}}
   .view-id-resultados #views_slideshow_controls_text_previous_resultados-page {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     border-radius: 40px;
     display: block;
     text-indent: -9999px;
@@ -430,8 +430,8 @@ body.page-resultados h2 {
     background: url("../images/izquierda.png") no-repeat center center, red; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000384}}
   .view-id-resultados #views_slideshow_controls_text_next_resultados-page {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     border-radius: 40px;
     text-indent: -9999px;
     display: block;
