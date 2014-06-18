@@ -370,7 +370,7 @@ body.page-resultados h1 {
   padding-top: 10px;
   padding-bottom: 10px; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000310}}
-body.page-resultados h2 {
+body.page-resultados h2 a {
   color: white;
   text-shadow: 3px 3px 4px rgba(0, 0, 0, 0.8);
   font-size: 50px;
