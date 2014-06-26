@@ -308,31 +308,58 @@ body.page-integrantes-del-equipo #views_slideshow_cycle_main_resultados-page .vi
 body.page-propuestas h1 {
   color: #f20303;
   font-size: 110px;
-  font-weight: 100; }
+  font-weight: 100;
+  text-decoration: none; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\000039}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000310}}
 .view-propuestas {
   width: 1200px;
   margin: 0 auto; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000312}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000313}}
   .view-propuestas .group-left {
     width: 600px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000316}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000317}}
   .view-propuestas .group-right {
     width: 600px;
     padding-left: 100px;
     padding-right: 100px;
     text-align: left; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000321}}
-    .view-propuestas .group-right h2 {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000322}}
+    .view-propuestas .group-right h2 a {
       color: white;
       text-shadow: 2px 2px 2px black;
       font-size: 45px;
-      margin: 0px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000328}}
+      margin: 0px;
+      text-decoration: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000330}}
     .view-propuestas .group-right p {
       color: white;
       font-size: 25px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000338}}
+.node-type-propuesta article {
+  width: 1200px;
+  margin: 0 auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000342}}
+  .node-type-propuesta article .field--name-field-imagen-propuesta {
+    width: 600px;
+    margin: 45px auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000347}}
+  .node-type-propuesta article .field--name-body {
+    width: 600px;
+    margin: 30px auto;
+    color: #fff;
+    font-size: 40px;
+    text-align: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000356}}
+.node-type-propuesta #block-facebook-comments-box-facebook-comments-box {
+  background: #fff;
+  padding-top: 40px;
+  padding-bottom: 80px;
+  margin-bottom: -90px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_propuestas\.scss}line{font-family:\0000361}}
+  .node-type-propuesta #block-facebook-comments-box-facebook-comments-box h2 {
+    display: none; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\000032}}
 body.page-resultados h1 {
@@ -343,7 +370,7 @@ body.page-resultados h1 {
   padding-top: 10px;
   padding-bottom: 10px; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000310}}
-body.page-resultados h2 {
+body.page-resultados h2 a {
   color: white;
   text-shadow: 3px 3px 4px rgba(0, 0, 0, 0.8);
   font-size: 50px;
@@ -391,8 +418,8 @@ body.page-resultados h2 {
     display: none; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000370}}
   .view-id-resultados #views_slideshow_controls_text_previous_resultados-page {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     border-radius: 40px;
     display: block;
     text-indent: -9999px;
@@ -403,8 +430,8 @@ body.page-resultados h2 {
     background: url("../images/izquierda.png") no-repeat center center, red; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/var\/www\/gobierno\/html\/sites\/all\/themes\/jugarenequipo\/sass\/components\/_resultados\.scss}line{font-family:\0000384}}
   .view-id-resultados #views_slideshow_controls_text_next_resultados-page {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     border-radius: 40px;
     text-indent: -9999px;
     display: block;
