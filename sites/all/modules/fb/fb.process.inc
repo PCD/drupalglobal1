@@ -32,7 +32,7 @@ function fb_process($output, $options = array()) {
   global $base_url;
   global $_fb, $_fb_app;
 
-  // Default to canvas links
+  // Default to canvas links.
   if (!isset($options['to_canvas'])) {
     $options['to_canvas'] = $_fb_app->canvas;
   }
@@ -44,7 +44,10 @@ function fb_process($output, $options = array()) {
 
   if ($_fb) {
     if (function_exists('fb_url_outbound_alter')) {
-      $rewrite_options = array(FB_SETTINGS_CB_SESSION => FALSE, FB_SETTINGS_CB_TYPE => FALSE);
+      $rewrite_options = array(
+        FB_SETTINGS_CB_SESSION => FALSE,
+        FB_SETTINGS_CB_TYPE => FALSE,
+      );
       $base_rewrite = '';
       fb_url_outbound_alter($base_rewrite, $rewrite_options, '');
       $base = $base_path . $base_rewrite;  // short URL with rewrite applied.
@@ -60,6 +63,18 @@ function fb_process($output, $options = array()) {
         // Make relative links point to canvas pages.
         $patterns[] = "|<a([^>]*)href=\"{$base}|";
         $replacements[] = "<a $1 href=\"$protocol://apps.facebook.com/{$canvas}/";
+      }
+      elseif (!empty($options['to_page'])) {
+        // Make relative links point to page tab.
+        $to_page = $options['to_page'];
+
+        // Note that url parameters will be lost on page tabs.  Facebook will not pass them on to our iframe.
+        $patterns[] = "|<a([^>]*)href=\"{$base}([^\"\?]*)\?|";
+        $replacements[] = "<a $1 href=\"$to_page" . "&app_data=$2&";
+
+        // Pattern without URL params.
+        $patterns[] = "|<a([^>]*)href=\"{$base}|";
+        $replacements[] = "<a $1 href=\"$to_page" . "&app_data=";
       }
       else {
         // Make relative links point to website.
@@ -108,4 +123,3 @@ function fb_process($output, $options = array()) {
   else
     return $output;
 }
-

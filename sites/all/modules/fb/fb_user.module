@@ -80,7 +80,43 @@ function fb_user_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  // Callback to visit a user page when their fbu is known but not their uid.  (i.e. from javascript)
+  $items['fb_user/%fb_graph'] = array(
+    'title' => 'My account',
+    'title callback' => 'fb_user_page_title',
+    'title arguments' => array(1),
+    'page callback' => 'fb_user_view_page',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+
   return $items;
+}
+
+/**
+ * Menu callback to set title.
+ */
+function fb_user_page_title($fb_user) {
+  return $fb_user['name'];
+}
+
+/**
+ * Menu page callback.
+ * Send user to local profile page of a facebook user.
+ */
+function fb_user_view_page($fb_user) {
+  if ($uid = fb_get_uid($fb_user['id'])) {
+    // Send user to Drupal profile page. The primary purpose of this callback.
+    drupal_goto("user/$uid");
+  }
+  // A very simple page.
+  $output['picture'] = array(
+    '#type' => 'markup',
+    '#markup' => '<img src="//graph.facebook.com/' . $fb_user['id'] . '/picture" alt="' . $fb_user['name'] . '" />',
+  );
+  return $output;
 }
 
 /**
@@ -169,7 +205,7 @@ function fb_user_fb($op, $data, &$return) {
       fb_controls(FB_USER_CONTROL_NO_CREATE_MAP, TRUE);
       fb_controls(FB_USER_CONTROL_NO_CREATE_ACCOUNT, TRUE);
     }
-    if (isset($_REQUEST['_fb_user_fbu'])) {
+    if (isset($_REQUEST['_fb_user_fbu']) && $_REQUEST['_fb_user_fbu'] == $fbu) {
       // We've triggered a reload. Don't redirect again, as that will
       // cause infinite loop if browser not accepting third-party cookies.
       fb_controls(FB_USER_CONTROL_NO_REDIRECT, TRUE);
@@ -259,12 +295,14 @@ function _fb_user_check_and_goto() {
     $uid = $GLOBALS['user']->uid; // Remember original uid.
     _fb_user_process_authorized_user();
     if ($uid != $GLOBALS['user']->uid) {
-      // during user processing, we started a new session.
+      // We've detected a change of user and started a new session.  Refresh page.
       if (!fb_controls(FB_USER_CONTROL_NO_REDIRECT)) {
-        // No longer passing _fb_user_fbu, because it causes problem when logging out of one frame then refreshing a frame with that parameter in the URL.
-        drupal_goto(request_path(), array(
-                      //'_fb_user_fbu' => $fbu, // Avoid refresh loop, disabled for now.  Still needed?
-                    ));
+        if (empty($REQUEST['_fb_user_fbu']) || $REQUEST['_fb_user_fbu'] != $fbu) {
+          drupal_goto(request_path(), array(
+                        // Parameter avoids refresh loop when third-party cookies disabled on Safari.
+                        'query' => array('_fb_user_fbu' => $fbu),
+                      ));
+        }
       }
     }
   }
@@ -551,7 +589,7 @@ function fb_user_form_alter(&$form, &$form_state, $form_id) {
       $form['fb_user'] = array(
         '#fb_user' => NULL,
         'connected' => array(
-          '#prefix' => '<div class=fb_connected>', '#suffix' => '</div>',
+          '#prefix' => '<div class="fb_connected">', '#suffix' => '</div>',
           'picture' => array(
             '#markup' => '<fb:profile-pic uid="loggedinuser" linked="false" facebook-logo="true"></fb:profile-pic>',
             '#type' => 'markup',
@@ -561,7 +599,7 @@ function fb_user_form_alter(&$form, &$form_state, $form_id) {
           'text' => array(
             '#type' => 'markup',
             '#markup' => t('!name, after <a href="!login_url">login</a> or <a href="!register_url">registration</a> your account will be connected.', array(
-                            '!name' => '<fb:name uid=loggedinuser useyou=false linked=false></fb:name>',
+                            '!name' => '<fb:name uid="loggedinuser" useyou="false" linked="false"></fb:name>',
                             '!login_url' => url('user/login'),
                             '!register_url' => url('user/register'),
                           )),
@@ -769,6 +807,11 @@ function fb_user_user_logoutXXX($account) { // Disabled.  Still needed?  Seems t
                     'next' => $next_url,
                     'cancel_url' => $next_url,
                   ));
+
+    // Drupal 7 calls us before destroying the session, so destroy it here
+    // manually, as we're about to redirect.
+    session_destroy();
+
     drupal_goto($logout_url);
   }
 }
@@ -778,6 +821,12 @@ function fb_user_user_logoutXXX($account) { // Disabled.  Still needed?  Seems t
  */
 function fb_user_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
   global $user, $_fb_app;
+
+  if (empty($_fb_app)) {
+    // No application active.
+    // @todo: should this alter loop through all known apps?
+    return;
+  }
 
   if (!user_access('administer users') &&
       !(user_access('delete own fb_user authmap') &&
@@ -1150,7 +1199,7 @@ function _fb_user_get_fbu($uid) {
     // Look up this user in the authmap
     $result = db_query("SELECT fbu FROM {fb_user} WHERE uid = :uid", array(
                          ':uid' => $uid,
-                                 ))->fetchObject();
+                       ))->fetchObject();
     if ($result) {
       $cache[$uid] = $result->fbu;
     }

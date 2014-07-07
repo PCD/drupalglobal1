@@ -50,18 +50,44 @@ function fb_stream_permission() {
   );
 }
 
+/**
+ * Implements hook_node_insert().
+ *
+ * Post to facebook stream when new node is created.
+ */
 function fb_stream_node_insert($node) {
+  // Defer any contact with Facebook until later, after all node hooks have run.
+  // Facebook will visit our URL to get any graph tags, but Drupal will not
+  // properly return the page if insert is not complete.
+  drupal_register_shutdown_function('fb_stream_post_on_shutdown',$node);
+}
+
+/**
+ * Implements hook_node_update().
+ *
+ * Post to facebook stream when new content is edited.
+ */
+function fb_stream_node_update($node) {
+  drupal_register_shutdown_function('fb_stream_post_on_shutdown',$node);
+}
+
+/**
+ * Logic to post to a Facebook stream.  This callback is invoked as the page
+ * request shuts down, as late as possible in the order.  This runs after
+ * all node insert/update hooks have completed.
+ */
+function fb_stream_post_on_shutdown($node) {
   if (TRUE) { // Maintain same level of indentation as D6 branch, so that patches easily apply.
-    if ($node->fb_stream_do_post) {
+    if (!empty($node->fb_stream_do_post)) {
       $node_url = url("node/$node->nid", array('absolute' => TRUE));
 
+      $body = field_get_items('node', $node, 'body');
       $params = array(
         'access_token' => $node->fb_stream_from_token,
         'message' => $node->fb_stream_message,
         'link' => $node_url,
         'name' => $node->title,
-        //'description' => $node->teaser, // TODO: how in D7?
-        'description' => drupal_render(node_view($node, $view_mode = 'teaser')),
+        'description' => text_summary($body[0]['value']),
         'caption' => variable_get('site_name', ''),
         'actions' => json_encode(array(
                                    'name' => t('View More'),
@@ -79,31 +105,41 @@ function fb_stream_node_insert($node) {
 
         try {
           $result = fb_graph($node->fb_stream_to . '/feed', $params, 'POST');
-          // Result should include an id of the post, but we can't query the single post via the graph.
+          // ID returned to us is not a normal graph ID.  We can't query it, but can build a permalink.
           if ($result['id']) {
-            // TODO: link to proper wall.
-            drupal_set_message(t('Content posted to Facebook.'));
+            $exploded_result = explode('_', $result['id']);
+            $story_fbid = 'story_fbid=' . $exploded_result[1];
+            $id = 'id=' . $exploded_result[0];
+            $link = FB_FACEBOOK_BASE_URL . '/' . 'permalink.php?' . $story_fbid . '&' . $id ;
+
+            drupal_set_message(t('Posted %node to <a href="!url" target="_blank">Facebook</a>.', array(
+                                   '!url' => $link,
+                                   '%node' => $node->title,
+                                 )));
           }
         }
         catch (Exception $e) {
-          drupal_set_message(t('Unable to post content to facebook.'), 'warning');
-          fb_log_exception($e, t('Post to Facebook stream failed.'));
+          $msg = t('Failed to post content to Facebook.');
+          drupal_set_message($msg, 'warning');
+          fb_log_exception($e, $msg);
         }
+      }
+      else {
+        // Cannot post without link name.  If here, implement hook_fb_stream() to ensure name is set.
+        drupal_set_message(t('Cannot post <a href=!link>%title (node/!nid)</a> to facebook.  Post has no name.', array(
+                               '!nid' => $node->nid,
+                               '!link' => $node_url,
+                               '%title' => $node->title,
+                             )), 'warning');
       }
     }
   }
-}
-
-
-function fb_stream_node_update($node) {
-  fb_stream_node_insert($node);
 }
 
 /**
  * Implements hook_form_alter().
  */
 function fb_stream_form_alter(&$form, &$form_state, $form_id) {
-  //dpm(func_get_args(), __FUNCTION__);
   if (isset($form['#node_type']) && 'node_type_form' == $form_id) {
     fb_stream_node_settings_form($form);
   }
@@ -117,7 +153,6 @@ function fb_stream_form_alter(&$form, &$form_state, $form_id) {
       // Defaults configured per node type.
       $from_token = variable_get('fb_stream_from_token__' . $type, $token);
       $from_id = variable_get('fb_stream_from__' . $type, NULL);
-      $from_user = variable_get('fb_stream_from_user__' . $type, NULL);
       $to_id = variable_get('fb_stream_to__' . $type, NULL);
 
       try {
@@ -139,25 +174,21 @@ function fb_stream_form_alter(&$form, &$form_state, $form_id) {
 
         // These args will be passed to t() more than once in the code that follows.
         $t_args = array(
-          '%to' => $to['name'],
-          '%via' => $via['name'],
-          '%me' => $me['name'],
+          '%to' => _fb_get_name($to),
+          '%via' => _fb_get_name($via),
+          '%me' => _fb_get_name($me),
         );
 
         $form['fb_stream']['fb_stream_do_post'] = array(
           '#type' => 'checkbox',
           '#title' => t('Post to Facebook'),
-          '#description' => t('Post this content to %to on Facebook via the %via application and %me\'s account.', $t_args),
+          '#description' => ($to['id'] == $me['id']) ? t('Post this content to %to on Facebook via %via application.', $t_args) : t('Post this content to %to on Facebook via the %via application and %me\'s account.', $t_args),
         );
 
         // Default details configured per node type.
         $form['fb_stream']['override']['fb_stream_to'] = array(
           '#type' => 'value',
           '#value' => $to_id,
-        );
-        $form['fb_stream']['override']['fb_stream_from_user'] = array(
-          '#type' => 'value',
-          '#value' => $from_user,
         );
 
         if (user_access(FB_STREAM_PERM_OVERRIDE)) {
@@ -183,22 +214,16 @@ function fb_stream_form_alter(&$form, &$form_state, $form_id) {
             '#default_value' => $to_id,
           );
 
-          $form['fb_stream']['override']['fb_stream_from_user'] = array(
-            '#type' => 'checkbox',
-            '#title' => t('Post as %me', $t_args),
-            '#description' => t('If you selected a Page Wall, the post\'s author will be that Page.  Check this box to force the author to be the user (%me) instead. <br/>If unchecked, the post will reach fans who <em>like</em> the Page.  If checked, the post will reach <em>friends of</em> %me.', $t_args),
-            '#default_value' => $from_user,
-          );
-
           // We'll need the token that corresponds to our "from" option.  We don't want to include tokens directly in the form, for security.
           $form['#fb_stream_from_tokens'] = $from_tokens;
           $form['#validate'][] = 'fb_stream_node_form_validate';
-          $form['fb_stream']['fb_stream_from_token'] = array(
-            // placeholder.  See fb_stream_node_settings_form_validate().
-            '#type' => 'value',
-            '#value' => $from_token,
-          );
         }
+
+        $form['fb_stream']['fb_stream_from_token'] = array(
+          // placeholder.  See fb_stream_node_settings_form_validate().
+          '#type' => 'value',
+          '#value' => $from_token,
+        );
 
         $form['fb_stream']['fb_stream_message'] = array(
           '#type' => 'textfield',
@@ -228,38 +253,40 @@ function fb_stream_post_options($token, &$to_options, &$from_options, &$from_tok
   try {
     // TODO: consolodate graph api, use batch. And cache.
     $me = fb_graph('me', array('access_token' => $token));
-    try {
-      $accounts = fb_graph('me/accounts', array('access_token' => $token));
-    }
-    catch (Exception $e) {
-      // We get here if me is a page.  Not a problem in that case.
-      $accounts = array('data' => array());
-    }
+
+    // Ideally, we could inspect $me to determine whether it is a user account or something else (i.e. a page).  Until we figure out how to do that, we use the fact that me/accounts can be queried for users, but pages will throw exception.
 
     // "to" options are facebook ids.
-    $to_options[$me['id']] = $me['name'];
+    $to_options[$me['id']] = _fb_get_name($me);
 
     // "from" options are ids.
-    $from_options[$me['id']] = $me['name'];
+    $from_options[$me['id']] = _fb_get_name($me);
 
     // We will also need the access token that corresponds to "from" options.
     $from_tokens[$me['id']] = $token;
 
-    foreach ($accounts['data'] as $account) {
-      // @TODO add only if access_token found
-      if (!isset($account['name'])) {
-        // @TODO handle applications more smarter.
-        $name = $account['category'] . ' ' . $account['id'];
-      }
-      else {
-        $name = $account['name'];
-      }
-      $to_options[$account['id']] = $name;
+    try {
+      $accounts = fb_graph('me/accounts', array('access_token' => $token));
 
-      if (!empty($account['access_token'])) {
-        $from_options[$account['id']] = $name;
-        $from_tokens[$account['id']] = $account['access_token'];
+      foreach ($accounts['data'] as $account) {
+        // @TODO add only if access_token found
+        if (!isset($account['name'])) {
+          // @TODO handle applications more smarter.
+          $name = $account['category'] . ' ' . $account['id'];
+        }
+        else {
+          $name = $account['name'];
+        }
+        $to_options[$account['id']] = $name;
+
+        if (!empty($account['access_token'])) {
+          $from_options[$account['id']] = $name;
+          $from_tokens[$account['id']] = $account['access_token'];
+        }
       }
+    }
+    catch (Exception $e) {
+      // If we could not query me/accounts, we only have one option.
     }
   }
   catch (Exception $e) {
@@ -292,9 +319,10 @@ function fb_stream_node_settings_form(&$form) {
 
   );
 
+  // Use $var_prefix because Drupal will append $node_type when saving variables.
   $var_prefix = 'fb_stream_enabled_';
   $var = $var_prefix . '_' . $node_type;
-  $form['fb_stream'][$var] = array(
+  $form['fb_stream'][$var_prefix] = array( // $var_prefix looks wrong, but is right.
     '#type' => 'checkbox',
     '#title' => t('Enable Post to Facebook for this content type.'),
     '#default_value' => variable_get($var, FALSE),
@@ -320,27 +348,21 @@ function fb_stream_node_settings_form(&$form) {
     $via = fb_graph('app', array('access_token' => $token));
 
     $t_args = array(
-      '%from' => $me['name'],
-      '%via' => $via['name'],
+      '%from' => _fb_get_name($me),
+      '%via' => _fb_get_name($via),
     );
 
 
     $var_prefix = 'fb_stream_to_';
     $var = $var_prefix . '_' . $node_type;
-    $form['fb_stream'][$var] = array(
+    $form['fb_stream'][$var_prefix] = array(
       '#type' => 'select',
       '#title' => t("Post to wall"),
       '#options' => $to_options,
-      '#description' => t('Post to which Facebook Wall?'),
+      '#description' => t('Post to which Facebook Wall?  If you don\'t see the options you expect, you may need a new <a href=!url target=_blank>access token</a>.', array(
+                        '!url' => url(FB_PATH_ADMIN . '/fb_stream'),
+                      )),
       '#default_value' => variable_get($var, NULL),
-    );
-
-    $var_prefix = 'fb_stream_from_user_';
-    $var = $var_prefix . '_' . $node_type;
-    $form['fb_stream'][$var] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Post as user'),
-      '#description' => t('If you selected a Page Wall, the post\'s author will be that Page.  Check this box to force the author to be the user instead. <br/>If unchecked, the post will reach fans who <em>like</em> the Page.  If checked, the post will reach <em>friends of</em> the user (%from).', $t_args),
     );
 
     // We'll need the token that corresponds to our "from" option.  We don't want to include tokens directly in the form, for security.
@@ -360,22 +382,20 @@ function fb_stream_node_settings_form(&$form) {
 
 function fb_stream_node_settings_form_validate($form, &$form_state) {
   $values = $form_state['values'];
-  if (!$values['fb_stream_from_user_'] &&
-      ($to_id = $values['fb_stream_to_'])) {
+  if ($to_id = $values['fb_stream_to_']) {
     // Save the token for the facebook wall.
     form_set_value($form['fb_stream']['fb_stream_from_token_'],
-                   $form['#fb_stream_from_tokens'][$to_id], $form_state);
+      $form['#fb_stream_from_tokens'][$to_id], $form_state);
   }
 }
 
 function fb_stream_node_form_validate($form, &$form_state) {
   $values = $form_state['values'];
 
-  if (!$values['fb_stream_from_user'] &&
-      ($to_id = $values['fb_stream_to']) &&
-      count($form['#fb_stream_from_tokens'])) {
+  if (($to_id = $values['fb_stream_to']) &&
+    count($form['#fb_stream_from_tokens'])) {
     form_set_value($form['fb_stream']['fb_stream_from_token'],
-                   $form['#fb_stream_from_tokens'][$to_id], $form_state);
+      $form['#fb_stream_from_tokens'][$to_id], $form_state);
   }
 }
 

@@ -58,8 +58,8 @@ function fb_registration_form_alter(&$form, &$form_state, $form_id) {
     // Registration has been enabled for this form.
 
     $sr = $GLOBALS['_fb']->getSignedRequest();
-    if ($sr &&
-        ($registration = $sr['registration'])) {
+    if ($sr && !empty($sr['registration'])) {
+      $registration = $sr['registration'];
       // The form has been submitted.  We don't need to alter it.  Instead we
       // must submit the original form.
 
