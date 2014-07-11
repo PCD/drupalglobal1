@@ -62,7 +62,7 @@ function fb_user_admin_settings() {
     '#title' => t('Registration form button text'),
     '#size' => 60,
     '#default_value' => _fb_user_button_text('user_register_form'),
-    '#description' => t('Leave blank for facebook\'s default, currently "Login".'),
+    '#description' => t('Leave blank for facebook\'s default image, "Connect".'),
   );
   $form['fb_user_alter']['login'] = array(
     '#type' => 'fieldset',

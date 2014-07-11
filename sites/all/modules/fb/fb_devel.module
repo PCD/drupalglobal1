@@ -218,6 +218,7 @@ function fb_devel_fb($op, $data, &$return) {
     // server URL sanity check
     // This is an expensive test, because it invokes api_client.
     try {
+      // @todo admin.getAppProperties deprecated.  Use graph API instead.
       $props = $fb->api(array(
                  'method' => 'admin.getAppProperties',
                  'access_token' => fb_get_token($fb),
@@ -229,7 +230,7 @@ function fb_devel_fb($op, $data, &$return) {
         $baseurl = str_replace(array('http://','https://'), '', $GLOBALS['base_url']);
         foreach ($props as $prop => $url) {
           if ($url && (strpos($url, $baseurl) === FALSE)) {
-            $message = t('The Facebook Application labeled %label has a suspicious %prop.  The value is %value, while something starting with %url was expected.  Consider editing !applink.', array(
+            $message = t('The Facebook Application labeled %label has a suspicious %prop.  The value is %value. This server expected %url.  To repair !applink change the ID and secret, or sync remote settings.', array(
                            '%label' => $fb_app->label,
                            '%prop' => $prop,
                            '%value' => $url,
@@ -270,7 +271,7 @@ function fb_devel_fb($op, $data, &$return) {
 
   }
 
-  elseif ($op == FB_APP_OP_EVENT) {
+  elseif (module_exists('fb_app') && $op == FB_APP_OP_EVENT) {
     $type = $data['event_type'];
     // Facebook has notified us of some event.
     $message = t('Facebook has notified the %label application of a %type event.',
@@ -643,7 +644,11 @@ function fb_devel_info() {
   $info['request'] = $_REQUEST;
   $info['user'] = $GLOBALS['user'];
   $info['fb_app'] = $_fb_app;
-  $info['session'] = $_SESSION;
+
+  if (isset($_SESSION)) {
+    $info['session'] = $_SESSION;
+  }
+
   $info['cookies'] = $_COOKIE;
   $info['cache'] = variable_get('cache', NULL);
 
@@ -652,6 +657,7 @@ function fb_devel_info() {
     try {
       // app properties
       $token = fb_get_token($_fb);
+      // @todo: getAppProperties deprecated.  Use graph API instead.
       $props = $_fb->api(array(
                            'method' => 'admin.getAppProperties',
                            'properties' => 'about_url', 'application_name',

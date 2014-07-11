@@ -88,9 +88,9 @@ function fb_permission_fb($op, $data, &$return) {
       $return['fb_permission_0'] = "debugger;";
       $return['fb_permission'] = "FB.login(function(response){}, {scope:$perm_string});";
 
-      // Haven't figured out how to make this work.
+      // Haven't figured out how to make this dialog work.
       //$return['fb_permission'] = "FB.ui({method:'oauth',scope:$perm_string}, function(response){debugger;});";
-      dpm($return);
+      //dpm($return);
     }
   }
 }
@@ -328,4 +328,3 @@ function fb_permission_form_alter(&$form, $state, $id) {
     }
   }
 }
-

@@ -26,10 +26,10 @@ function theme_fb_markup($params) {
 
   $output = '';
   if ($not_connected_markup) {
-    $output .= '<' . $options['wrapper'] . ' class=fb_not_connected>' . $not_connected_markup . '</' . $options['wrapper'] . '>';
+    $output .= '<' . $options['wrapper'] . ' class="fb_not_connected">' . $not_connected_markup . '</' . $options['wrapper'] . '>';
   }
   if ($connected_markup) {
-    $output .= '<' . $options['wrapper'] . ' class=fb_connected>' . $connected_markup . '</' . $options['wrapper'] . '>';
+    $output .= '<' . $options['wrapper'] . ' class="fb_connected">' . $connected_markup . '</' . $options['wrapper'] . '>';
   }
   return $output;
 }
@@ -71,11 +71,16 @@ function theme_fb_login_button($params) {
   $scope = $options['attributes']['scope'];
   unset($options['attributes']['scope']); // New markup does not need this attr.
 
-  $markup = '<div ' . drupal_attributes($options['attributes']) . '><a href="#" onclick="FB.login(function(){}, {scope : \'' . $scope . '\'}); return false;"><div><span>' . $text . '</span></div></a></div>';
-
+  if ($text) {
+    $markup = '<div ' . drupal_attributes($options['attributes']) . '><a href="#" onclick="FB.login(function(){}, {scope : \'' . $scope . '\'}); return false;"><div><span>' . $text . '</span></div></a></div>';
+  }
+  else {
+    // No text, use default image.
+    $markup = '<div class="fb_login_button_wrapper"><a href="#" onclick="FB.login(function(){}, {scope : \'' . $scope . '\'}); return false;"><span><img src="//www.facebook.com/images/fbconnect/login-buttons/connect_light_medium_short.gif" alt="fb connect" /></span></a></div>';
+  }
   if ($options['connected_markup']) {
-    $markup = '<div class=fb_not_connected>' . $markup . '</div>' .
-      '<div class=fb_connected>' . $options['connected_markup'] . '</div>';
+    $markup = '<div class="fb_not_connected">' . $markup . '</div>' .
+      '<div class="fb_connected">' . $options['connected_markup'] . '</div>';
   }
   return $markup;
 }
@@ -108,8 +113,8 @@ function theme_fb_login_buttonXXX($text = '', $options = array()) {
 
   // Show picture instead of button when user is connected.
   if ($options['connected_markup']) {
-    $button = '<div class=fb_not_connected>' . $button . '</div>' .
-      '<div class=fb_connected>' . $options['connected_markup'] . '</div>';
+    $button = '<div class="fb_not_connected">' . $button . '</div>' .
+      '<div class="fb_connected">' . $options['connected_markup'] . '</div>';
   }
 
   return $button;
@@ -124,7 +129,7 @@ function theme_fb_username($params) {
     return $orig;
   }
 
-  $wrap_pre = "<span class=fb_hide>$orig</span><span class=fb_show>";
+  $wrap_pre = "<span class=\"fb_hide\">$orig</span><span class=\"fb_show\">";
   $wrap_post = "</span>\n";
   $ifcantsee = '';
   if ($object->uid && user_access('access user profiles')) {
@@ -134,7 +139,7 @@ function theme_fb_username($params) {
     $ifcantsee = 'ifcantsee="' . addslashes(check_plain($object->name)) . '"';
   }
 
-  $fbml = "<fb:name linked=false useyou=false uid=\"$fbu\" $ifcantsee></fb:name>";  $output =  $wrap_pre . $fbml . $wrap_post;
+  $fbml = "<fb:name linked=\"false\" useyou=\"false\" uid=\"$fbu\" $ifcantsee></fb:name>";  $output =  $wrap_pre . $fbml . $wrap_post;
 
   return $output;
 }
@@ -148,7 +153,7 @@ function theme_fb_user_picture($params) {
   $orig = $params['orig'];
 
   // http://developers.facebook.com/docs/reference/fbml/profile-pic
-  $fbml = "<fb:profile-pic linked=false uid=\"$fbu\"></fb:profile-pic>";
+  $fbml = "<fb:profile-pic linked=\"false\" uid=\"$fbu\"></fb:profile-pic>";
   $wrap_pre = '<span class=fb_hide>' . $orig . '</span><span class="fb_show"><div class="picture">';
   $wrap_post = '</div></span>';
   if ($object->uid && user_access('access user profiles')) {

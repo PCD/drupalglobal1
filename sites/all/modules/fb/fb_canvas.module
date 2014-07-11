@@ -153,7 +153,7 @@ function fb_canvas_fb($op, $data, &$return) {
       $output = ob_get_contents();
       ob_end_clean();
       if (fb_canvas_is_iframe()) {
-        include_once(drupal_get_path('module', 'fb') . '/fb.process.inc');
+        include_once drupal_get_path('module', 'fb') . '/fb.process.inc';
         $output = fb_process($output, array(
                                'add_target' => '_top',
                                'absolute_links' => variable_get(FB_CANVAS_VAR_PROCESS_ABSOLUTE, TRUE),
@@ -177,22 +177,13 @@ function fb_canvas_fb($op, $data, &$return) {
         if (fb_verbose()) {
           watchdog('fb_debug', "FB_OP_EXIT on canvas page redirecting to $app_destination (original destination was $destination).");
         }
-        fb_canvas_redirect($app_destination);
+        fb_iframe_redirect($app_destination);
       }
     }
     if (isset($output)) {
-      print($output);
+      print $output;
     }
   }
-}
-
-function fb_canvas_redirect($url) {
-  // Unset drupal's header
-  if (function_exists('header_remove')) { // php 5.3
-    header_remove('Location');
-  }
-  echo "<script type=\"text/javascript\">\ntop.location.href = \"$url\";\n</script>";
-  exit;
 }
 
 /**
@@ -257,7 +248,7 @@ function fb_canvas_goto($path) {
       module_invoke_all('exit', $url);
     }
 
-    fb_canvas_redirect($url);
+    fb_iframe_redirect($url);
   }
   else {
     drupal_goto($path);
@@ -266,36 +257,6 @@ function fb_canvas_goto($path) {
 }
 
 
-/**
- * Convert a local fully qualified path to a facebook app path.  This needs to
- * be used internally, to fix drupal_gotos upon form submission.  Third party
- * modules should not need to call this.
- */
-function fb_canvas_fix_url($url, $fb_app) {
-  //dpm(debug_backtrace(), "fb_canvas_fix_url($url)");
-  global $base_url;
-
-  // Url rewrites still used for iframe canvas pages.
-  $patterns[] = "|{$base_url}/" . FB_SETTINGS_CB . "/{$fb_app->apikey}/|";
-  // Here we hard-wire apps.facebook.com.  Is there an API to get that?
-  // base_root is from Drupal's conf_init().
-  $replacements[] = fb_protocol() . "://apps.facebook.com/{$fb_app->canvas}/";
-
-  // Fully qualified paths.
-  $patterns[] = "|" . url('', array('absolute' => TRUE)) . "|";
-  $replacements[] = fb_protocol() . "://apps.facebook.com/{$fb_app->canvas}/";
-
-  $url = preg_replace($patterns, $replacements, $url);
-  if (strpos($url, '//apps.facebook.com/') !== FALSE) {
-    // Facebook expects "appNNN_" prepended to hash
-    $patterns = "|#([^\?]*)|";
-    $replacements = "#app{$fb_app->id}_$1";
-
-    $url = preg_replace($patterns, $replacements, $url);
-  }
-
-  return $url;
-}
 
 
 /**
@@ -382,5 +343,17 @@ function fb_canvas_custom_theme() {
     if ($custom_theme = $fb_canvas_data['theme_iframe']) {
       return $custom_theme;
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_html().
+ *
+ * Add canvas page specific body classes.
+ */
+function fb_canvas_preprocess_html(&$variables) {
+  if (fb_is_canvas()) {
+    $variables['classes_array'][] = 'fb_canvas-resizable';
+    $variables['classes_array'][] = 'fb-canvas';
   }
 }

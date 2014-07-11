@@ -21,10 +21,13 @@ define('FB_TAB_PATH_FORM_ARGS', 2);
 define('FB_TAB_PATH_ADDED', 'fb_tab/added'); // user redirected here after adding page tab.
 define('FB_TAB_PATH_ADDED_ARGS', 2);
 
-define('FB_TAB_VAR_PROCESS_FBML', 'fb_tab_process_fbml');
 define('FB_TAB_VAR_PROCESS_IFRAME', 'fb_tab_process_iframe');
 define('FB_TAB_VAR_PROCESS_ABSOLUTE', 'fb_tab_process_absolute_links');
 define('FB_TAB_VAR_PROCESS_TO_CANVAS', 'fb_tab_process_to_canvas');
+
+define('FB_TAB_PROCESS_IFRAME_NONE', 'none');
+define('FB_TAB_PROCESS_IFRAME_TO_CANVAS', 'canvas');
+define('FB_TAB_PROCESS_IFRAME_TO_TAB_VIA_APP_DATA', 'app_data');
 
 function fb_tab_menu() {
   $items = array();
@@ -155,11 +158,6 @@ function fb_tab_fb($op, $data, &$return) {
         // Process iframe
         $use_ob = TRUE;
       }
-      elseif (fb_settings(FB_SETTINGS_TYPE) == FB_SETTINGS_TYPE_PROFILE &&
-              variable_get(FB_TAB_VAR_PROCESS_FBML, TRUE)) {
-        // Process FBML
-        $use_ob = TRUE;
-      }
       else {
         $use_ob = FALSE;
       }
@@ -175,34 +173,59 @@ function fb_tab_fb($op, $data, &$return) {
         $GLOBALS['fb_tab_post_process'] = TRUE;
       }
 
-      // Override what Drupal renders.
+      // If path is fb_tab/view, we may actually show some other menu item.
       if (arg(0) == 'fb_tab' && arg(1) == 'view') { // Do not override fb_tab/config.
         $sr = $fb->getSignedRequest();
-        if ($sr['page'] && $sr['page']['liked'] && $config['profile_tab_url_liked']) {
+
+        if (!empty($sr['app_data']) &&
+            !empty($config['app_data_is_path'])) {
+          $path = $sr['app_data'];
+        }
+        elseif ($sr['page'] && $sr['page']['liked'] && $config['profile_tab_url_liked']) {
           $path = $config['profile_tab_url_liked'];
         }
         else {
           $path = $config['profile_tab_url'];
         }
+
+        // Enable token replacement from signed request.
+        $path = token_replace($path, array(), array('clear' => TRUE));
+
+        // <front> is a special path
+        $path = str_replace('<front>', variable_get('site_frontpage', 'node'), $path);
+
         if ($path && $path != FB_TAB_PATH_VIEW) {
           // Tell Drupal what to really render.
           menu_set_active_item(drupal_get_normal_path($path));
         }
       }
-
     }
   }
   elseif ($op == FB_OP_EXIT && fb_is_tab()) {
     if (isset($GLOBALS['fb_tab_post_process']) && $GLOBALS['fb_tab_post_process']) {
       $output = ob_get_contents();
       ob_end_clean();
-      include_once(drupal_get_path('module', 'fb') . '/fb.process.inc');
+      include_once drupal_get_path('module', 'fb') . '/fb.process.inc';
 
-      if (variable_get(FB_TAB_VAR_PROCESS_TO_CANVAS, TRUE)) {
+      $process = variable_get(FB_TAB_VAR_PROCESS_IFRAME, FB_TAB_PROCESS_IFRAME_TO_CANVAS);
+
+      if ($process == FB_TAB_PROCESS_IFRAME_TO_CANVAS) {
         $to_canvas = $fb_app->canvas;
       }
       else {
         $to_canvas = FALSE;
+      }
+
+      $to_page = FALSE;
+      $page = NULL;
+      if ($process == FB_TAB_PROCESS_IFRAME_TO_TAB_VIA_APP_DATA) {
+        if ($page_id = fb_settings(FB_SETTINGS_PAGE_ID)) {
+          $page = fb_graph($page_id);
+          if (!empty($page['link'])) {
+            // @TODO: $page['link'] may change protocol from https to http.
+            $to_page = $page['link'] . "?v=app_" . fb_settings(FB_SETTINGS_ID);
+          }
+        }
       }
 
       if (fb_settings(FB_SETTINGS_TYPE) == FB_SETTINGS_TYPE_PAGE_TAB) {
@@ -212,6 +235,7 @@ function fb_tab_fb($op, $data, &$return) {
                                'absolute_links' => variable_get(FB_TAB_VAR_PROCESS_ABSOLUTE, TRUE),
                                'relative_links' => variable_get(FB_TAB_VAR_PROCESS_IFRAME, TRUE),
                                'to_canvas' => $to_canvas,
+                               'to_page' => $to_page,
                              ));
       }
       elseif (fb_settings(FB_SETTINGS_TYPE) == FB_SETTINGS_TYPE_PROFILE) {
@@ -223,9 +247,28 @@ function fb_tab_fb($op, $data, &$return) {
                              ));
       }
       if (isset($output)) {
-        print($output);
+        print $output;
       }
     }
+
+    $destination = $return;
+    if ($destination) {
+      // A normal redirect will affect only our iframe.
+      // We must instead send the user to our page on facebook.com.
+
+      if ($process == FB_TAB_PROCESS_IFRAME_TO_TAB_VIA_APP_DATA) {
+        if (!empty($to_page)) {
+          $url = fb_iframe_fix_url($destination, $to_page . '&app_data=');
+
+          // It's not ideal to call this here, as doing so prevents other
+          // hook_exits from running.  However there's no later
+          // opportunity to change where Drupal would send us.
+          fb_iframe_redirect($url);
+        }
+      }
+
+    }
+
   }
 }
 
@@ -263,6 +306,7 @@ function _fb_tab_get_app_config($fb_app) {
     'tab_default_name' => isset($fb_app->title) ? $fb_app->title : NULL,
     'profile_tab_url' => NULL,
     'profile_tab_url_liked' => NULL,
+    'app_data_is_path' => TRUE,
     'edit_url' => FB_TAB_PATH_FORM,
   );
   return $config;
@@ -287,11 +331,10 @@ function fb_tab_view() {
     'fb' => $fb,
     'profile_id' => $profile_id,
     'config' => isset($config['data']) ? $config['data'] : NULL,
-    'page' => $sr['page'],
+    'page' => isset($sr['page']) ? $sr['page'] : NULL,
   );
 
   $content = fb_invoke(FB_TAB_OP_VIEW, $data, array(), FB_TAB_HOOK);
-
   return drupal_render($content);
 }
 
@@ -303,8 +346,6 @@ function fb_tab_config_form($form_state, $profile_id) {
   $fb = $GLOBALS['_fb'];
 
   $config = fb_tab_get_page_config($fb_app, $profile_id);
-  $sr = $fb->getSignedRequest();
-
   $sr = $fb->getSignedRequest();
 
   $data = array(
@@ -511,4 +552,3 @@ function fb_tab_config_url($profile_id = NULL, $options = array()) {
   }
   return url(FB_TAB_PATH_FORM . '/' . $profile_id, $options);
 }
-
