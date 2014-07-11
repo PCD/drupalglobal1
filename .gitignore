@@ -10,6 +10,10 @@ sites/*/.DS_Store
 feria.jpg
 nayarit1.mp3
 # Ignore some Sites
+sites/asiganalagente.com
+build
+pdfjs
+web
 sites/www.periodicoenfoque.com
 sites/periodicoenfoque.com
 sites/local.enequipo.com
