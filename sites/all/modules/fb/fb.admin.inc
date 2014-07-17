@@ -8,8 +8,8 @@
 
 define('FB_ADMIN_HOOK', 'fb_admin');
 
-define('FB_ADMIN_OP_LIST_PROPERTIES', 'list_props'); // list of known properties for admin.getAppProperties
-define('FB_ADMIN_OP_SET_PROPERTIES', 'set_props'); // build props for admin.setAppProperties
+define('FB_ADMIN_OP_LIST_PROPERTIES', 'list_props'); // list of known properties to read.
+define('FB_ADMIN_OP_SET_PROPERTIES', 'set_props'); // build props that will be set.
 define('FB_ADMIN_OP_POST_SET_PROPERTIES', 'post_set_props'); // after props have been set (third party module may set addition values, i.e. restrictions).
 
 // Pages which may or may not be supported by the app implementation.
@@ -35,25 +35,24 @@ function fb_admin_page() {
 
     foreach ($apps as $fb_app) {
       // Get properties from facebook.
-      fb_admin_get_app_properties($fb_app);
+      fb_admin_get_app_info($fb_app);
 
       $row = array();
       // Title.
       $row[] = $fb_app->label . ($fb_app->status ? '' : ' ' . t('(<em>not enabled</em>)'));
 
       // New apps no longer have about pages.
-      $name = isset($fb_app->application_name) ? $fb_app->application_name : $fb_app->label;
-      if ($fb_app->about_url) {
-        $row[] = l($name, $fb_app->about_url);
-      }
-      else {
-        $row[] = $name;
-      }
+      $name = isset($fb_app->name) ? $fb_app->name : $fb_app->label;
+      $row[] = $name;
 
       // Canvas Page.
-      if (isset($fb_app->canvas_name) &&
-          $fb_app->canvas_name != $fb_app->canvas) {
-        drupal_set_message(t('Canvas page for %label is out of sync!  Facebook believes it is %fbcanvas, while our database believes %canvas.  Edit and save the application to remedy this.', array('%label' => $fb_app->label, '%fbcanvas' => $fb_app->canvas_name, '%canvas' => $fb_app->canvas)), 'error');
+      if (isset($fb_app->namespace) &&
+          $fb_app->namespace != $fb_app->canvas) {
+        drupal_set_message(t('Canvas page for %label is out of sync!  Facebook believes it is %fbcanvas, while our database believes %canvas.  Edit and save the application to remedy this.', array(
+                               '%label' => $fb_app->label,
+                               '%fbcanvas' => $fb_app->namespace,
+                               '%canvas' => $fb_app->canvas,
+                             )), 'error');
       }
       if ($fb_app->canvas) {
         $row[] = l($fb_app->canvas, $protocol . '://apps.facebook.com/' . $fb_app->canvas);
@@ -110,7 +109,7 @@ function fb_admin_page() {
 
 function fb_admin_app_page($fb_app = NULL) {
   fb_get_app_data($fb_app);
-  fb_admin_get_app_properties($fb_app);
+  fb_admin_get_app_info($fb_app);
   $fb = fb_api_init($fb_app);
 
   // @TODO use an actual theme function and make render more appealing.
@@ -119,16 +118,19 @@ function fb_admin_app_page($fb_app = NULL) {
   unset($fb_app->data);
 
   // Warn user if values have changed since last edit.
-  foreach (array('canvas_name' => 'canvas', 'application_name' => 'title') as $prop => $key) {
-    if (isset($fb_app->$prop) && $fb_app->$prop != $fb_app->$key) {
-      drupal_set_message(t("The property %prop has been changed to %value on facebook.  Go to the Edit tab, confirm values are correct and hit Save button to syncronize the local values.",
-                           array('%prop' => $prop, '%value' => $fb_app->$prop)), 'error');
+  foreach (array('namespace' => 'canvas', 'name' => 'title') as $prop => $key) {
+    if (isset($fb_app->$prop) && isset($fb_app->$key) && $fb_app->$prop != $fb_app->$key) {
+      if (module_exists('fb_app')) {
+        drupal_set_message(t("The property %prop has been changed to %value on facebook.  Go to the Edit tab, confirm values are correct and hit Save button to syncronize the local values.",
+            array('%prop' => $prop, '%value' => $fb_app->$prop)), 'error');
+      }
     }
   }
 
   $props_map = array(
     t('Name') => 'name',
     t('Label') => 'label',
+    t('Namespace') => 'namespace',
     t('ID') => 'id',
     t('Secret') => 'secret',
   );
@@ -142,11 +144,16 @@ function fb_admin_app_page($fb_app = NULL) {
     }
   }
 
+  // This clause belongs in fb_canvas.module.  But currently no hook for that tab to add a "property" that is not a true facebook property.
+  if (!empty($fb_app->namespace) && !empty($fb_app->callback_url)) {
+    $canvas_url = '//apps.facebook.com/' . $fb_app->namespace;
+    $output .= '<dt>' . t('Canvas pages') . '</dt><dd>' . "<a href=\"$canvas_url\">$canvas_url</a>" . '</dd>';
+  }
+
   // This clause belongs in fb_tab.module.  But currently no hook for that tab to add a "property" that is not a true facebook property.
-  // Note: fb_app->installable no longer means anything.
-  if ($fb_app->profile_tab_url && module_exists('fb_tab')) {
+  if ( isset($fb_app->page_tab_url) && $fb_app->page_tab_url && module_exists('fb_tab')) {
     // This app can be added to a page.  Provide a link to do so.
-    $add_url = "http://www.facebook.com/dialog/pagetab?app_id=$fb_app->id&next=" . url(FB_TAB_PATH_ADDED . '/' . $fb_app->label, array('absolute' => TRUE, 'language' => FALSE));
+    $add_url = "http://www.facebook.com/dialog/pagetab?app_id=$fb_app->id&next=" . url(FB_TAB_PATH_ADDED . '/' . $fb_app->label, array('absolute' => TRUE, 'language' => NULL));
     $output .= '<dt>' . t('Add to page link') . '</dt><dd>' . l($add_url, $add_url) . '</dd>';
   }
 
@@ -174,23 +181,18 @@ function fb_admin_page_title($fb_app) {
   return $fb_app->label;
 }
 
-/**
- * Get properties from Facebook.  Fills in the data that we need to know by
- * querying facebook.  Uses admin.getAppProperties, an older API which may be
- * replaced by the newer graph api.  Certainly additional "properties" may be
- * learned via the graph.  In other words, this function works as it does for
- * historical reasons.
- */
-function fb_admin_get_app_properties(&$fb_app) {
+function fb_admin_get_app_info(&$fb_app) {
   $cache = &drupal_static('fb_admin:cache');
   $props_map = &drupal_static('fb_admin:props_map');
   if (!isset($cache)) {
     $cache = array();
-    // http://wiki.developers.facebook.com/index.php/ApplicationProperties
+    // https://developers.facebook.com/docs/reference/api/application/
     $props_map = array(
-      t('About URL') => 'about_url',
-      t('Application Name') => 'application_name',
-      t('Edit URL') => 'edit_url',
+      t('Application Name') => 'name',
+      t('Namespace') => 'namespace',
+      t('Logo') => 'logo_url',
+      // Learn canvas name regardless of whether fb_canvas is enabled.
+      t('Namespace') => 'namespace',
     );
     $props_map = fb_invoke(FB_ADMIN_OP_LIST_PROPERTIES, array('fb_app' => $fb_app), $props_map, FB_ADMIN_HOOK);
   }
@@ -198,25 +200,27 @@ function fb_admin_get_app_properties(&$fb_app) {
   if (!isset($cache[$fb_app->id])) {
     if ($fb = fb_api_init($fb_app)) {
       try {
-        $props = fb_call_method($fb, 'admin.getAppProperties', array(
-                                  'properties' => implode(',', array_values($props_map)),
-                                ));
-        $cache[$fb_app->id] = $props;
+        $info = fb_graph($fb_app->id, array(
+                           'access_token' => fb_get_token($fb),
+                           'fields' => implode(',', array_values($props_map)),
+                         ));
+        $cache[$fb_app->id] = $info;
       } catch (Exception $e) {
         fb_log_exception($e, t('Failed to get application properties (%label) from Facebook', array('%label' => $fb_app->label)));
       }
     }
   }
   else {
-    $props = $cache[$fb_app->id];
+    $info = $cache[$fb_app->id];
   }
 
   // Update $fb_app with the values we got from facebook api.
   foreach ($props_map as $key) {
-    if (isset($props[$key])) {
-      $fb_app->$key = $props[$key];
+    if (isset($info[$key])) {
+      $fb_app->$key = $info[$key];
     }
   }
+
 }
 
 
@@ -283,18 +287,20 @@ function fb_admin_set_properties_form($form, &$form_state, $fb_app) {
 }
 
 /**
- * Button submit function.  Use has clicked delete, send them to confirm page.
+ * Confirm form submit function.
+ * We don't use fb_app_set_app_properties, because fb_app.module may not be enabled.
  */
 function fb_admin_set_properties_form_submit($form, &$form_state) {
   $fba_id = $form_state['values']['fba_id'];
   $fb_app = fb_get_app(array('fba_id' => $fba_id));
+
   $props = $form['#fb_props'];
   if ($fb_app && count($props)) {
     if ($fb = fb_api_init($fb_app)) {
       try {
-        $result = fb_call_method($fb, 'admin.setAppProperties', array(
-                                   'properties' => json_encode($props),
-                                 ));
+        $result = fb_graph($fb_app->id, $props + array('access_token' => fb_get_token($fb)), 'POST', $fb);
+        // @todo handle $result != true, if that ever happens.
+
         // Success.
         $form_state['redirect'] = FB_PATH_ADMIN_APPS . '/' . $fb_app->label;
 
@@ -308,15 +314,12 @@ function fb_admin_set_properties_form_submit($form, &$form_state) {
                    l(t('view apps'), FB_PATH_ADMIN));
         }
 
-        // Update local data with values learned from facebook.
-        fb_admin_get_app_properties($fb_app);
-        if ($fb_app->fba_id && $fb_app->canvas_name && module_exists('fb_app')) {
-          // @TODO - clean this up or move it to fb_app.module.  fb.module should have no knowledge of fb_app table.
-          db_update('fb_app')
-            ->fields(array('canvas' => $fb_app->canvas_name))
-            ->condition('fba_id', $fb_app->fba_id, '=')
-            ->execute();
-        }
+        // Allow third-parties to set additional "properties" such as restrictions.  And allow fb_app.module to store application namespace.
+        fb_invoke(FB_ADMIN_OP_POST_SET_PROPERTIES, array(
+                    'fb_app' => $fb_app,
+                    'fb' => $fb,
+                    'properties' => $props,
+                  ), array(), FB_ADMIN_HOOK);
 
       } catch (Exception $e) {
         drupal_set_message(t('Failed to set the following properties for %label application.  You may need to manually editing remote settings!<br/><pre>!props</pre>', array('%label' => $fb_app->label, '!props' => print_r($props, 1))), 'error');
@@ -343,7 +346,7 @@ function fb_admin_settings() {
     '#type' => 'radios',
     '#title' => t('Use Secure URLs'),
     '#default_value' => variable_get(FB_VAR_SECURE_URLS, FB_SECURE_URLS_SOMETIMES),
-    '#description' => t('This setting affects your applications\' connect_url, callback_url, secure_callback_url, profile_tab_url, and secure_page_tab_url properties.'),
+    '#description' => t('This setting affects your applications\' website_url, canvas_url, secure_canvas_url, profile_tab_url, and secure_page_tab_url properties.'),
     '#options' => array(
       FB_SECURE_URLS_NEVER => t('Never use HTTPS. (I.e. this server does not support it.)'),
       FB_SECURE_URLS_SOMETIMES => t('Use HTTPS only when Facebook expects a secure URL. (Recommended.)'),
@@ -423,20 +426,30 @@ function fb_admin_settings() {
   );
 
   $form['fb_username_performance'] = array(
-    '#title' => t('Username Formatting'),
+    '#title' => t('Username Altering'),
     '#type' => 'fieldset',
-    '#description' => t('If some pages render very slowly, you may wish to disable username formatting.'),
+    '#description' => t('Display human-readable names instead of <em>1234...@facebook</em>.  If some pages render very slowly, you may wish to disable username formatting.'),
     '#collapsible' => TRUE,
   );
   $form['fb_username_performance'][FB_VAR_ALTER_USERNAME] = array(
     '#type' => 'radios',
-    '#title' => t('Format Usernames'),
+    '#title' => t('Alter Usernames'),
     '#default_value' => variable_get(FB_VAR_ALTER_USERNAME, FB_ALTER_USERNAME_NOT_THEMING),
     '#description' => t(''),
     '#options' => array(
-      FB_ALTER_USERNAME_NEVER => t('<strong>Never</strong> - In emails and page titles users might see unsightly names like "12345@facebook".'),
-      FB_ALTER_USERNAME_NOT_THEMING => t('<strong>Smart</strong> - Format names in email and page title, but skip formatting when theming markup.  Recommended; however, due to limitations of Drupal API, this only works when <a href=!url target=_blank>fb_connect.module overrides theme_username()</a>.', array('!url' => url('admin/structure/fb/fb_connect'))),
-      FB_ALTER_USERNAME_ALWAYS => t('<strong>Always</strong> (not recommended) - May cause pages to render slowly.'),
+      FB_ALTER_USERNAME_NEVER => t('<strong>Never</strong> - In email and page titles users might see unsightly names like <em>1234...@facebook</em>.'),
+      FB_ALTER_USERNAME_NOT_THEMING => t('<strong>Smart</strong> - Change names in email and page titles, but skip in page markup.  Recommended; however, due to limitations of Drupal API, this only works when <a href=!url target=_blank>fb_connect.module overrides theme_username()</a>.', array('!url' => url('admin/structure/fb/fb_connect'))),
+      FB_ALTER_USERNAME_ALWAYS => t('<strong>Always</strong> - May cause some pages to render slowly.'),
+    ),
+  );
+  $form['fb_username_performance'][FB_VAR_ALTER_USERNAME_AND_CACHE] = array(
+    '#type' => 'radios',
+    '#title' => t('Cache Altered Usernames'),
+    '#default_value' => variable_get(FB_VAR_ALTER_USERNAME_AND_CACHE, FB_ALTER_USERNAME_DONT_CACHE),
+    '#description' => t(''),
+    '#options' => array(
+      FB_ALTER_USERNAME_AND_CACHE => t('<strong>On</strong> - Store names in local database, so that facebook servers are queried less often.'),
+      FB_ALTER_USERNAME_DONT_CACHE => t('<strong>Off</strong> - Query facebook servers every time.  May impact performance.'),
     ),
   );
 
@@ -460,7 +473,7 @@ function fb_admin_settings() {
       '#title'  => t("Assigned Facebook's locale to @language", array('@language' => t($language->name))),
       '#type'  => 'select',
       '#options' => fb_admin_i18n_list(),
-      '#default_value' => fb_admin_i18n_map($language->language),
+      '#default_value' => variable_get('fb_language_' . $language->language, fb_admin_i18n_map($language->language)),
     );
   }
 

@@ -261,19 +261,16 @@ function boost_init() {
 }
 
 /**
- * Implements hook_drupal_goto_alter().
- */
-function boost_drupal_goto_alter(&$path, &$options, &$http_response_code) {
-  global $_boost;
-  // Bypass caching on redirects (issue #1176534).
-  $_boost['is_cacheable'] = FALSE;
-}
-
-/**
  * Implements hook_exit().
  */
 function boost_exit($destination = NULL) {
   global $_boost;
+
+  // Bypass caching on redirects (issues #1176534 and #1957532).
+  if(!empty($destination)) {
+    $_boost['is_cacheable'] = FALSE;
+  }
+
   // Bail out of caching.
   if (!isset($_boost['cache_this'])) {
     if (!isset($_boost['is_cacheable'])) {

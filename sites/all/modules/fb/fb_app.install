@@ -67,7 +67,7 @@ function fb_app_schema() {
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'We learn this from facebook app properties',
+        'description' => 'We learn this from facebook app properties, facebook now calls it namespace',
       ),
       'title' => array(
         'type' => 'varchar',
@@ -146,5 +146,3 @@ function fb_app_update_7301() {
   }
   return $ret;
 }
-
-

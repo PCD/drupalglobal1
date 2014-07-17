@@ -24,8 +24,18 @@ define('FB_GRAPH_VAR_OBJECT_TYPE_APP', 'fb_graph_object_type_app');
 
 define('FB_GRAPH_NOT_AN_OBJECT', 'fb_graph_none'); // deprecated
 
-function fb_graph_perm() {
-  return array(FB_GRAPH_PERM_PUBLISH, FB_GRAPH_PERM_DELETE_OWN);
+/**
+ * Implements hook_permission().
+ */
+function fb_graph_permission() {
+  return array(
+    FB_GRAPH_PERM_PUBLISH => array(
+      'title' => t('Publish own actions to facebook timeline'),
+    ),
+    FB_GRAPH_PERM_DELETE_OWN => array(
+      'title' => t('Delete own actions from facebook timeline'),
+    ),
+  );
 }
 
 /**
@@ -76,6 +86,10 @@ function fb_graph_fb($op, $data, &$return) {
  */
 function fb_graph_publish_action($action, $params, $options = array()) {
   if (!user_access(FB_GRAPH_PERM_PUBLISH)) {
+    if (fb_verbose()) {
+      // Because custom modules call this function and can get tripped up by permissions, log a message.
+      watchdog('fb_graph', 'User does not have permission to publish facebook action.', array(), WATCHDOG_WARNING);
+    }
     return;
   }
 
@@ -134,7 +148,6 @@ function fb_graph_publish_action($action, $params, $options = array()) {
     }
     else {
       if (fb_verbose()) {
-        // This happens all the time.  I don't know why.
         watchdog('fb_graph', 'Failed to publish %action by user %fbu to facebook.  Facebook did not return an ID!', array(
                    '%action' => $action,
                    '%fbu' => $fbu,
@@ -146,8 +159,8 @@ function fb_graph_publish_action($action, $params, $options = array()) {
     fb_log_exception($e, t('Failed to publish %action_type action', array(
                              '%action_type' => $action_type,
                            )));
-    $args = func_get_args();
-    watchdog('fb_graph', __FUNCTION__ . '<pre>' . dprint_r($args, 1) . '</pre>'); // debug
+    //$args = func_get_args();
+    //watchdog('fb_graph', __FUNCTION__ . '<pre>' . dprint_r($args, 1) . '</pre>'); // debug
   }
 }
 
@@ -310,27 +323,15 @@ function fb_graph_taxonomy_form_vocabulary_submit($form, &$form_state) {
   }
 }
 
+
 /**
- * Implements hook_nodeapi().
- *
- * TODO: upgrade to D7!!!
+ * Implements hook_node_view()
+ * Add reasonable opengraph tags to node pages.
  */
-function fb_graph_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-  if ($op == 'view' && $a4) { // Full page view
-
-    // Some tags might come from taxonomy.
-    if (!empty($node->taxonomy)) {
-      foreach ($node->taxonomy as $tid => $term) {
-        if (variable_get('fb_graph_is_metadata_' . $term->vid, FALSE)) {
-          // Treat this tag as metadata.
-          unset($node->taxonomy[$tid]);
-          $v = taxonomy_vocabulary_load($term->vid);
-          fb_graph_set_tag($v->name, $term->name, FALSE);
-
-          // @TODO support multiple terms concatinated together.
-        }
-      }
-    }
+function fb_graph_node_view($node, $view_mode, $langcode) {
+  if ($view_mode == 'full') {
+    //dpm(func_get_args(), __FUNCTION__);
+    // TODO: support taxonomy fields, as supported in D6.
 
     // Some tags might come from content type.
     if ($fb_graph_type = variable_get(FB_GRAPH_VAR_OBJECT_TYPE . '_' . $node->type, '')) {
@@ -350,6 +351,11 @@ function fb_graph_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
     fb_graph_set_tag('og:url', url('node/' . $node->nid, array('absolute' => TRUE)), FALSE);
     fb_graph_set_tag('og:title', t($node->title), FALSE);
 
+    if (variable_get(FB_GRAPH_VAR_SMART_TAGS, TRUE)) {
+      $body = field_get_items('node', $node, 'body');
+      fb_graph_set_tag('og:description', text_summary($body[0]['value']), FALSE);
+    }
+
     if (isset($tags['og:type']) && variable_get(FB_GRAPH_VAR_SMART_TAGS, TRUE)) {
       if ($tags['og:type'] == 'article') {
         fb_graph_set_tag('article:published_time', format_date($node->created, 'custom', 'Y-m-dTH:iZ'), FALSE);
@@ -365,8 +371,11 @@ function fb_graph_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   }
 }
 
-function fb_graph_user($op, &$edit, &$account, $category = NULL) {
-  if ($op == 'view') {
+/**
+ * Implements hook_user_view().
+ */
+function fb_graph_user_view($account, $view_mode, $langcode) {
+  if ($view_mode == 'full') {
     // Add smart default tags.
     $tags = fb_graph_get_tags();
     if (!isset($tags['og:type']) && variable_get(FB_GRAPH_VAR_SMART_TAGS, TRUE)) {

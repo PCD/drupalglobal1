@@ -13,7 +13,12 @@
  */
 function fb_example_install() {
   // So we fall after og_vocab and og.
-  db_query("UPDATE {system} SET weight = 3 WHERE name='fb_example'");
+  db_update('system')
+  ->fields(array(
+    'weight' => 3,
+  ))
+  ->condition('name', 'fb_example')
+  ->execute();
 }
 
 /**
@@ -21,8 +26,12 @@ function fb_example_install() {
  *
  * Set weight so that fb_example comes after fb_user.
  */
-function fb_example_update_1() {
-  $ret = array();
-  $ret[] = update_sql("UPDATE {system} SET weight = 3 WHERE name='fb_example'");
+function fb_example_update_7001() {
+  db_update('system')
+  ->fields(array(
+    'weight' => 3,
+  ))
+  ->condition('name', 'fb_example')
+  ->execute();
   return $ret;
 }

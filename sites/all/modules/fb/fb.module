@@ -19,6 +19,8 @@ define('FB_PATH_ADMIN_APPS_ARGS', 4);
 define('FB_PATH_AJAX_EVENT', 'fb/ajax');
 define('FB_PATH_AJAX_EVENT_ARGS', 2);
 
+define('FB_FACEBOOK_BASE_URL', '//www.facebook.com');
+
 // permissions
 define('FB_PERM_ADMINISTER', 'administer fb apps');
 
@@ -59,6 +61,7 @@ define('FB_VAR_JS_OAUTH', 'fb_js_oauth'); // Whether to pass oauth: true to FB.i
 define('FB_VAR_CURL_NOVERIFY', 'fb_curl_noverify');
 define('FB_VAR_SECURE_URLS', 'fb_secure_urls');
 define('FB_VAR_ALTER_USERNAME', 'fb_format_username');
+define('FB_VAR_ALTER_USERNAME_AND_CACHE', 'fb_cache_username');
 
 // Possible choices for secure urls.
 define('FB_SECURE_URLS_ALWAYS', 1);
@@ -69,6 +72,10 @@ define('FB_SECURE_URLS_NEVER', -1);
 define('FB_ALTER_USERNAME_ALWAYS', 'always');
 define('FB_ALTER_USERNAME_NEVER', 'never');
 define('FB_ALTER_USERNAME_NOT_THEMING', 'when_not_theming');
+
+// Possible choices for caching the formated username
+define('FB_ALTER_USERNAME_AND_CACHE', 'on');
+define('FB_ALTER_USERNAME_DONT_CACHE', 'off');
 
 // node_access realms (belongs here?)
 define('FB_GRANT_REALM_FRIEND', 'fb_friend');
@@ -342,8 +349,8 @@ function fb_init() {
       $fb_lang = $_SESSION['fb_locale'];
     }
     else {
-      $user_language = user_preferred_language($GLOBALS['user']);
-      $fb_lang = variable_get('fb_language_' . $user_language->language, 'en_US');
+      global $language;
+      $fb_lang = variable_get('fb_language_' . $language->language, 'en_US');
     }
 
     $js_sdk = fb_protocol() . "://connect.facebook.net/$fb_lang/all.js";
@@ -359,6 +366,41 @@ function fb_init() {
 
   // See also fb_page_alter(), where we initialize facebook's SDK.
 }
+
+/**
+ * Implements hook_tokens().
+ *
+ * Nothing to do with facebook access tokens.  This drupal hook supports
+ * token replacement via token_replace().
+ */
+function fb_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  if (strpos($type, 'fb') === 0) {
+    $items = array();
+
+    // Add defaults to $data array.
+    $data = $data + fb_vars();
+    if (!isset($data['fb_signed_request']) && !empty($data['fb'])) {
+      $data['fb_signed_request'] = $data['fb']->getSignedRequest();
+    }
+    if (!isset($data['fb_settings']) && function_exists('fb_settings')) {
+      $data['fb_settings'] = fb_settings();
+    }
+
+    if (is_array($data[$type])) {
+      foreach ($data[$type] as $key => $value) {
+        if (!is_array($value)) {
+          $items["[$type:$key]"] = $value;
+        }
+        // TODO: support nested values (i.e. recurse into arrays)
+      }
+    }
+
+    // TODO support additional fb token types.  I.e. fb_app, fb_settings.
+
+    return $items;
+  }
+}
+
 
 /**
  * Implements hook_rdf_namespaces().
@@ -557,6 +599,10 @@ function fb_graph($path, $params = array(), $method = 'GET', $fb = NULL) {
 
   if (isset($http->data)) {
     $data = json_decode($http->data, TRUE);
+    // Most times graph returns JSON, but other times query string.  Thanks Facebook!
+    if (!$data) {
+      parse_str($http->data, $data);
+    }
   }
   else {
     $data = array(); // avoid php warnings.
@@ -597,7 +643,6 @@ function fb_graph($path, $params = array(), $method = 'GET', $fb = NULL) {
     throw new Exception($message); // Do we need our own code???
   }
 }
-
 
 /**
  * Helper to get the tokens needed to accss facebook's API.
@@ -649,7 +694,7 @@ function fb_get_token($fb = NULL, $fbu = NULL) {
           $result = cache_set($cache_key, $token, 'cache', CACHE_TEMPORARY);
         }
       }
-      if (!$token) {
+      if (empty($token)) {
         watchdog('fb', 'Failed to get application (%app_id) access token.', array('%app_id' => $app_id), WATCHDOG_ERROR);
       }
     }
@@ -783,6 +828,22 @@ function fb_api_batch($fb, $queries, $params, $method = 'GET') {
   return $data;
 }
 
+/**
+ * Helper function determines a name from data returned from fb_graph().
+ * Almost always, graph data includes a 'name'.  But in rare cases that is
+ * not present and we use an id instead.
+ */
+function _fb_get_name($graph_data) {
+  if (!empty($graph_data['name'])) {
+    return $graph_data['name'];
+  }
+  elseif (!empty($graph_data['id'])) {
+    return $graph_data['id'];
+  }
+  else {
+    return t('Unknown');
+  }
+}
 
 /**
  * Implements hook_page_alter().
@@ -792,19 +853,12 @@ function fb_page_alter(&$page) {
   global $_fb, $_fb_app;
 
   // This element recommended by facebook. http://developers.facebook.com/docs/reference/javascript/
-  $output = "<div id=\"fb-root\"></div>\n";
+  $output = "<div id=\"fb-root\" class=\"fb_module\"></div>\n";
 
   $settings = fb_js_settings();
 
   $output .= "<script type=\"text/javascript\">\n";
   $output .= "<!--//--><![CDATA[//><!--\n";
-
-  // Put this here instead of fb_devel.module because it must come first.
-  if (module_exists('fb_devel')) {
-    $output .= "if (typeof(FB_Devel) != 'undefined') {\n";
-    $output .= "  FB_Devel.sanityCheck()\n";
-    $output .= "}\n";
-  }
 
   // Pending javascript that needs to execute after FB is initialized.
   $js_array = fb_invoke(FB_OP_JS, array('fb' => $GLOBALS['_fb'], 'fb_app' => $GLOBALS['_fb_app']), array());
@@ -861,8 +915,6 @@ function fb_is_canvas() {
  * Is the current page a profile tab?
  */
 function fb_is_tab() {
-  global $_fb;
-
   if (fb_settings(FB_SETTINGS_TYPE) == FB_SETTINGS_TYPE_PAGE_TAB) {
     return TRUE;
   }
@@ -884,8 +936,10 @@ function fb_is_tab() {
  */
 function fb_is_page_liked() {
   global $_fb;
-  $sr = $_fb->getSignedRequest();
-  return (isset($sr['page']) && $sr['page']['liked']);
+  if (!empty($_fb)) {
+    $sr = $_fb->getSignedRequest();
+    return (isset($sr['page']) && $sr['page']['liked']);
+  }
 }
 
 /**
@@ -895,8 +949,10 @@ function fb_is_page_liked() {
  */
 function fb_is_page_admin() {
   global $_fb;
-  $sr = $_fb->getSignedRequest();
-  return (isset($sr['page']) && $sr['page']['admin']);
+  if (!empty($_fb)) {
+    $sr = $_fb->getSignedRequest();
+    return (isset($sr['page']) && $sr['page']['admin']);
+  }
 }
 
 
@@ -949,6 +1005,7 @@ function fb_api_check_session($fb) {
  */
 function _fb_logout() {
   if (session_name()) { // Avoid PHP warning.
+    session_start(); // Make sure there is a session before destroy.
     session_destroy();
     $GLOBALS['user'] = drupal_anonymous_user();
     drupal_session_initialize();
@@ -962,11 +1019,13 @@ function _fb_logout() {
  * connect pages, or when infinite session has been initialized.
  */
 function fb_facebook_user($fb = NULL) {
-  if (!isset($fb))
+  if (!isset($fb)) {
     $fb = $GLOBALS['_fb'];
+  }
 
-  if (!$fb)
+  if (!$fb) {
     return;
+  }
 
   try {
     $fbu = $fb->getUser();
@@ -1009,8 +1068,8 @@ function fb_require_authorization($fb = NULL, $destination = NULL) {
       $url .= '&scope=' . implode(',', $perms);
     }
 
-    if (fb_is_canvas() && module_exists('fb_canvas')) {
-      fb_canvas_redirect($url);
+    if (fb_is_canvas() || fb_is_tab()) {
+      fb_iframe_redirect($url);
     }
     else {
       header('Location: ' . $url);  // drupal_goto is for internal redirects only.
@@ -1098,11 +1157,10 @@ function fb_get_object_fbu($object) {
     // $object->init may be present when object is a user.
     $fbu = substr($object->init, 0, $pos);
   }
-  elseif (isset($object->name) &&
-          $pos = strpos($object->name, '@facebook')) {
+  elseif (!empty($object->name) && ($pos = strpos($object->name, '@facebook'))) {
     $fbu = substr($object->name, 0, $pos);
   }
-  elseif ($object->uid > 0) {
+  elseif (!empty($object->uid)) {
     // This can be expensive on pages with many comments or nodes!
     $fbu = fb_get_fbu($object->uid);
   }
@@ -1149,14 +1207,14 @@ function fb_get_app_data(&$fb_app) {
 
 /**
  * Will return a human-readable name if the fb_app module supports it, or
- * fb_admin_get_app_properties($fb_app) has been called. However we don't
+ * fb_admin_get_app_info($fb_app) has been called.  However we don't
  * take the relatively expensive step of calling that ourselves.
  */
 function fb_get_app_title($fb_app) {
   if (isset($fb_app->title))
     return $fb_app->title;
-  elseif (isset($fb_app->application_name)) {
-    return $fb_app->application_name;
+  elseif (isset($fb_app->name)) {
+    return $fb_app->name;
   }
   else {
     return $fb_app->label;
@@ -1273,14 +1331,6 @@ function fb_get_groups_data($fbu, $fb_app = NULL) {
 
 //// Menu structure.
 
-// Attempt to make an access callback
-function fb_user_accessXXX($string, $account = NULL) {
-  if (!user_access(FB_PERM_ADMINISTER, $account)) {
-    // Require the user to authorize the app.
-    fb_require_authorization();
-  }
-  return user_access($string, $account);
-}
 
 /**
  * Implements hook_menu().
@@ -1466,18 +1516,126 @@ function fb_permission() {
 function fb_exit($destination = NULL) {
   global $_fb_app, $_fb;
 
+  $on_exit = &drupal_static('fb_invoke_async');
+  if (!empty($on_exit)) {
+    while ($args = array_shift($on_exit)) {
+      $func = array_shift($args);
+      if (fb_verbose()) {
+        watchdog('fb', t("Processing delayed call to %function."), array(
+                   '%function' => $func,
+                 ));
+      }
+      try {
+        $result = call_user_func_array($func, $args);
+      }
+      catch (Exception $e) {
+        fb_log_exception($e, t('Failed calling %function.',array(
+                                 '%function' => $func,
+                               )));
+      }
+    }
+  }
+
+
   if ($_fb_app && $_fb) {
 
     // Invoke other modules.
-    fb_invoke(FB_OP_EXIT, array('fb_app' => $_fb_app,
-                                'fb' => $GLOBALS['_fb']),
+    fb_invoke(FB_OP_EXIT, array(
+                'fb_app' => $_fb_app,
+                'fb' => $GLOBALS['_fb'],
+              ),
               $destination);
   }
 }
 
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Unfortunately fb_canvas has to process hook_exit last, so we tweak the order of hooks to enforce that order.
+ */
+function fb_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'exit') {
+    // Move our implementation to end of list.
+    $group = $implementations['fb'];
+    unset($implementations['fb']);
+    $implementations['fb'] = $group;
+  }
+  if ($hook == 'fb' && isset($implementations['fb_canvas'])) {
+    $group = $implementations['fb_canvas'];
+    unset($implementations['fb_canvas']);
+    $implementations['fb_canvas'] = $group;
+  }
+}
+
+function fb_iframe_redirect($url) {
+  // Unset drupal's header
+  if (function_exists('header_remove')) { // php 5.3
+    header_remove('Location');
+  }
+  echo "<script type=\"text/javascript\">\ntop.location.href = \"$url\";\n</script>";
+  exit;
+}
 
 /**
- * Invoke hook_fb.
+ * Convert a local fully qualified path to a facebook app path.  This needs to
+ * be used internally, to fix drupal_gotos upon form submission.  Third party
+ * modules should not need to call this.
+ */
+function fb_iframe_fix_url($url, $iframe_base) {
+  global $base_url;
+
+  if ($app_id = fb_settings(FB_SETTINGS_ID)) {
+    // Fully qualified paths.
+    $patterns[] = "|" . url('', array('absolute' => TRUE)) . "|";
+    $replacements[] = $iframe_base;
+
+    // Url rewrites still used for iframe pages. Still needed ???
+    $patterns[] = "|{$base_url}/" . FB_SETTINGS_CB . '/' . $app_id . '/|';
+    $replacements[] = $iframe_base;
+
+    $url = preg_replace($patterns, $replacements, $url);
+    if (strpos($url, $iframe_base) !== FALSE) {
+      // Facebook expects "appNNN_" prepended to hash
+      $patterns = "|#([^\?]*)|";
+      $replacements = "#app{$app_id}_$1";
+
+      $url = preg_replace($patterns, $replacements, $url);
+    }
+  }
+  return $url;
+}
+
+
+/**
+ * Call a function not now but later.  As late as possible during the current request.
+ *
+ * In practice the function will be invoked during hook_exit().  In an
+ * ideal world it might be nice to be invoked even later, similar to the
+ * way drupal processes cron in drupal_page_footer() without delaying the
+ * page returned to the user.  However I know of no drupal hook called
+ * later than hook_exit.
+ *
+ * Provided as a convenience for third-party modules that want to invoke
+ * some facebook API, but cannot do so right away.  For example say your
+ * module implements hook_node_insert and wants to publish a message about
+ * the new node to facebook.  You could try invoking
+ * fb_graph_publish_action() from your hook_node_insert(). Unfortunately
+ * facebook would immediately look up the new node on your server (to
+ * populate graph details), but drupal would return page not found instead
+ * of the inspected node because the insert has not yet finished!  To work
+ * around this call fb_invoke_async('fb_graph_publish_action', ...)
+ * instead.
+ *
+ * @see fb_exit().
+ */
+function fb_invoke_async() {
+  $cache = &drupal_static(__FUNCTION__);
+  $cache[] = func_get_args();
+}
+
+/**
+ * Invoke hook_fb().
+ * Only modules/fb modules should invoke this helper function which calls third-party hooks.
  */
 function fb_invoke($op, $data = NULL, $return = NULL, $hook = FB_HOOK) {
   foreach (module_implements($hook) as $name) {
@@ -1671,7 +1829,6 @@ function fb_verbose() {
  * hook_username_alter().
  *
  * Return a user's facebook name, instead of local username.
- * @TODO cache, because drupal doesn't, and calls this often.
  */
 function fb_username_alter(&$name, $account) {
   // This function can be called very early in the bootstrap process, before
@@ -1682,7 +1839,7 @@ function fb_username_alter(&$name, $account) {
   $enabled = variable_get(FB_VAR_ALTER_USERNAME, FB_ALTER_USERNAME_NOT_THEMING);
   if ($enabled == FB_ALTER_USERNAME_NEVER ||
       $enabled == FB_ALTER_USERNAME_NOT_THEMING && $is_theming_username) {
-    // Disable formatting when configured to do so.
+    // Altering disabled.
     return;
   }
 
@@ -1691,19 +1848,47 @@ function fb_username_alter(&$name, $account) {
     return;
   }
 
-  if (isset($GLOBALS['_fb']) && $fbu = fb_get_fbu($account)) { // @TODO - is fb_get_fbu() a performance hit here?
-    try {
-      // Use fql query instead of graph api, because it will succeed more often.
-      $data = fb_fql_query($GLOBALS['_fb'], "SELECT name FROM user WHERE uid=$fbu", array(
-                             'access_token' => fb_get_token($GLOBALS['_fb']),
-                           ));
-      if (count($data) && isset($data[0]['name'])) {
-        $name = $data[0]['name'];
+  if (!strpos($name, '@facebook')) {
+    // Only alter unique names created by fb_user.module.
+    return;
+  }
+
+  if ($fbu = fb_get_fbu($account)) {
+    // Querying names from facebook is expensive, so some trickery here to optimize things.
+
+    // First we try the static cache.
+    $names = &drupal_static(__FUNCTION__);
+
+    if (!isset($names[$fbu])) {
+      // Next try database cache.
+      $use_cache = variable_get(FB_VAR_ALTER_USERNAME_AND_CACHE, FB_ALTER_USERNAME_DONT_CACHE);
+      if($use_cache == FB_ALTER_USERNAME_AND_CACHE) {
+        if ($cache = cache_get('fb_username_' . $fbu)) {
+          $names[$fbu] = $cache->data;
+        }
       }
     }
-    catch (Exception $e) {
-      fb_log_exception($e, t('Failed to alter username for facebook user %fbu', array(
-                               '%fbu' => $fbu)));
+
+    if (!isset($names[$fbu]) && !empty($GLOBALS['_fb'])) {
+      // Nothing from the previous attempts worked so we have to query facebook.com.
+      try {
+        // Use fql query instead of graph api, because it will succeed more often.
+        $data = fb_fql_query($GLOBALS['_fb'], "SELECT name FROM user WHERE uid=$fbu", array('access_token' => fb_get_token($GLOBALS['_fb'])));
+        if (count($data) && isset($data[0]['name'])) {
+          $names[$fbu] = $data[0]['name'];
+
+          if($use_cache == FB_ALTER_USERNAME_AND_CACHE) {
+            cache_set('fb_username_' . $fbu, $names[$fbu]);
+          }
+        }
+      } catch (Exception $e) {
+        fb_log_exception($e, t('Failed to alter username for facebook user %fbu', array(
+                                 '%fbu' => $fbu)));
+      }
+    }
+
+    if (!empty($names[$fbu])) {
+      $name = $names[$fbu];
     }
   }
 }
@@ -1849,8 +2034,7 @@ function fb_ajax_event($event_type) {
  * @see http://developers.facebook.com/docs/reference/javascript/FB.init
  */
 function fb_channel_page() {
-  //headers instructing browser to cache this page.
-  // Do these work?
+  // Headers instruct browser to cache this page.
   drupal_add_http_header("Cache-Control", "public");
   drupal_add_http_header("Expires", "Sun, 17-Jan-2038 19:14:07 GMT");
 

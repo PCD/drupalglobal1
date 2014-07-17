@@ -26,6 +26,9 @@ function fb_rules_fb_user($op, $data, &$return) {
   elseif ($op == FB_USER_OP_POST_EXTERNAL_LOGIN) {  // User logged in through FB
     rules_invoke_event('fb_user_login', $user);
   }
+  elseif ($op == FB_USER_OP_POST_USER) { // Local user account created and connected to FB account 
+    rules_invoke_event('fb_user_created', $data['account']);
+  }
 }
 
 /**

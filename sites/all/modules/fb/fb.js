@@ -33,6 +33,7 @@ else {
  * Called when page is loaded, or content added via javascript.
  */
 FB_JS.drupalBehaviors = function(context) {
+
   // Sanity check.
   if (!Drupal.settings.fb) {
     // Reach here when Drupal footer is not rendered in page template.
@@ -72,7 +73,9 @@ FB_JS.drupalBehaviors = function(context) {
 
   if (Drupal.settings.fb.fb_reloading) {
     // The reloading flag helps us avoid infinite loops.  But will accidentally prevent a reload in some cases. We really want to prevent a reload for a few seconds.
-    setTimeout(function() {Drupal.settings.fb.fb_reloading = false;}, 5000);
+    setTimeout(function() {
+      Drupal.settings.fb.fb_reloading = false;
+    }, 5000);
   }
 };
 
@@ -199,10 +202,18 @@ FB_JS.getUrlVars = function(href) {
  * Reload the current page, whether on canvas page or facebook connect.
  *
  */
+FB_JS.reloading = false // semaphore prevents concurrent reloads.
 FB_JS.reload = function(destination) {
-
-  // Avoid infinite reloads.  Esp on canvas pages when third-party cookies disabled.
+  if (FB_JS.reloading) {
+    // We are attempting to reload two times at once.
+    return;
+  }
+  else {
+    FB_JS.reloading = true;
+  }
+  // Avoid repeated reloads.  Esp on canvas pages when third-party cookies disabled.
   if (Drupal.settings.fb.fb_reloading) {
+    // We are attempting a reload one after another.
     jQuery.event.trigger('fb_devel', destination); // Debug. JS and PHP SDKs are not in sync.
     return;
   }
@@ -246,15 +257,16 @@ FB_JS.reload = function(destination) {
   }
 
   // Feedback that entire page may be reloading.
-  // @TODO improve the appearance of this, make it customizable.
-  // This unweildy set of tags should make a progress bar in any Drupal site.
-  var fbMarkup = jQuery('.fb_connected,.fb_not_connected').wrap('<div class="progress" />').wrap('<div class="bar" />').wrap('<div class="filled" />');
-  if (fbMarkup.length) {
-    fbMarkup.hide(); // Hides FBML, leaves progress bar.
-  }
-  else {
-    // If no markup changed, throw a progress bar at the top of the page.
-    jQuery('body').prepend('<div id="fb_js_pb" class="progress"><div class="bar"><div class="filled"></div></div></div>');
+  if (typeof(Drupal.settings.fb.reload_progress) == 'undefined' || Drupal.settings.fb.reload_progress) {
+    // This unweildy set of tags should turn facebook-specific markup into a progress indicator.
+    var fbMarkup = jQuery('.fb_connected,.fb_not_connected').wrap('<div class="progress" />').wrap('<div class="bar" />').wrap('<div class="filled" />');
+    if (fbMarkup.length) {
+      fbMarkup.hide(); // Hides FBML, leaves progress bar.
+    }
+
+
+    // Spinning progress indicator
+    jQuery('body').prepend('<div id="fb_reload"><div class="fb_spinner"></div></div>');
   }
 
   // Use POST to get past any caching on the server.
@@ -330,6 +342,13 @@ FB_JS.authResponseChange = function(response) {
     // Drupal.settings.fb.fbu (from server) not the same as status.fbu (from javascript).
     status.changed = true;
   }
+  else if (status.fbu && !response.authResponse) {
+    // A bug in facebook's all.js, user has logged out yet FB.getUserID() still returns their id!
+    // This is our workaround.
+    status.changed = true;
+    status.fbu = null;
+  }
+
 
   if (status.changed) {
     // Remember the fbu.
@@ -476,7 +495,7 @@ FB_JS.testGetLoginStatus = function(callback) {
 
 // Quick test whether object contains anything.
 FB_JS.isEmpty = function(ob) {
-  for(var i in ob){
+  for (var i in ob) {
     return false;
   }
   return true;

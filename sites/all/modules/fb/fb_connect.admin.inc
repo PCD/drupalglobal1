@@ -10,29 +10,27 @@
  */
 function fb_connect_fb_admin($op, $data, &$return) {
   if ($op == FB_ADMIN_OP_SET_PROPERTIES) {
-    $return['connect_url'] = fb_connect_get_connect_url($data['fb_app']);
+    $return['website_url'] = fb_connect_get_website_url($data['fb_app']);
     if (variable_get(FB_VAR_SECURE_URLS, FB_SECURE_URLS_SOMETIMES) == FB_SECURE_URLS_ALWAYS) {
-      $return['connect_url'] = str_replace('http://', 'https://', $return['connect_url']);
+      $return['website_url'] = str_replace('http://', 'https://', $return['website_url']);
     }
     else {
-      $return['connect_url'] = str_replace('https://', 'http://', $return['connect_url']);
+      $return['website_url'] = str_replace('https://', 'http://', $return['website_url']);
     }
   }
   elseif ($op == FB_ADMIN_OP_LIST_PROPERTIES) {
-    $return[t('Connect URL')] = 'connect_url';
+    $return[t('Webiste URL')] = 'website_url';
   }
 }
 
 /**
- * Convenience method to get an apps connect URL.
- *
+ * Convenience method to get an app's website URL.
  */
-function fb_connect_get_connect_url($fb_app) {
+function fb_connect_get_website_url($fb_app) {
   // absolute URL with no rewriting applied
   global $base_url;
 
   return $base_url . '/';
-
 }
 
 
@@ -85,4 +83,3 @@ function fb_connect_admin_settings() {
   );
   return system_settings_form($form);
 }
-

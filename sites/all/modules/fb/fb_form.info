@@ -3,9 +3,9 @@ description = (fb_form.module) DEPRECATED! Facebook no longer supports API used 
 package = Drupal for Facebook - deprecated
 dependencies[] = fb
 core = 6.x
-; Information added by drupal.org packaging script on 2012-11-27
-version = "7.x-3.3-beta5"
+; Information added by drupal.org packaging script on 2013-10-26
+version = "7.x-3.4"
 core = "7.x"
 project = "fb"
-datestamp = "1354042047"
+datestamp = "1382817027"
 

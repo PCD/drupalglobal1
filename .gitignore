@@ -10,9 +10,24 @@ sites/*/.DS_Store
 feria.jpg
 nayarit1.mp3
 # Ignore some Sites
+sites/asiganalagente.com
+build
+pdfjs
+web
+sites/www.periodicoenfoque.com
+sites/periodicoenfoque.com
 sites/local.enequipo.com
 sites/corasdeportivotepic.mx
 sites/drupal.diarioindependencia.com
+sites/cambox.mx
+sites/www.eldiariodenayarit.com
+sites/diariodenayarit.com
+sites/www.diariodenayarit.com
+sites/www.xn--sealdelagente-jkb.com
+sites/www.nayarit100.mx
+sites/www.sdgtv.com
+sites/gobiernodelagente.com
+sites/www.gobiernodelagente.com
 sites/local.cambox.com
 sites/local.asiganalagente.com
 sites/www.jugarenequipo.mx

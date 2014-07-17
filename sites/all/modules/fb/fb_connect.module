@@ -131,9 +131,12 @@ function _fb_connect_add_js($fb_app, $fb) {
     return;
 
   if (!isset($just_once)) {
+    // Drupal is inconsistent about appending a '/' at the end of urls.
+    $front_url = url('<front>');
+    $front_url .= (substr($front_url, -1) == '/' ? '' : '/');
     drupal_add_js(array(
                     'fb_connect' => array(
-                      'front_url' => url('<front>'),
+                      'front_url' => $front_url,
                       'fbu' => fb_facebook_user(),
                       'uid' => $GLOBALS['user']->uid,
                     ),
@@ -471,7 +474,7 @@ function fb_connect_theme_username_override($variables) {
   $account = $variables['account'];
   $orig = theme('fb_connect_username_orig', $variables);
 
-  if ($fbu = fb_get_object_fbu($account)) {
+  if ($account && ($fbu = fb_get_object_fbu($account))) {
     // Theme the username with XFBML, using original username as backup.
     $return_me = theme('fb_username', array(
                          'fbu' => $fbu,
@@ -486,6 +489,3 @@ function fb_connect_theme_username_override($variables) {
   $is_theming_username = FALSE;
   return $return_me;
 }
-
-
-

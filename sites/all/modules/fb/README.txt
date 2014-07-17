@@ -18,14 +18,14 @@ To upgrade from Drupal 6 to Drupal 7:
 - Upgrade your D6 version to 3.3 or later.  Run update.php and make sure everything seems to work.  Then upgrade drupal and all modules to D7 branch.
 
 
-To upgrade from on D7 version to the next:
+To upgrade from D7 version to the next:
 - Read the upgrade instructions: http://drupal.org/node/936958
 
 To install:
 
 - Make sure you have a PHP client from facebook (version >= 3.1.1).
   The 2.x.y versions are not supported by this version of Drupal for Facebook.
-  Download from https://github.com/facebook/facebook-php-sdk/downloads.
+  Download from https://github.com/facebook/facebook-php-sdk.
   Extract the files, and place them in sites/all/libraries/facebook-php-sdk.
 
   If you have the Libraries API module installed, you may place the files in
@@ -45,7 +45,8 @@ To install:
 
   xmlns:fb="http://www.facebook.com/2008/fbml"
 
-  Typically, this means editing your theme's page.tpl.php file.  See
+  Drupal 7 should include this by default.  Use your browser's view source feature to confirm.
+  If not, you may need to edit your theme's html.tpl.php file.  See
   http://www.drupalforfacebook.org/node/1106.  Note this applies to
   themes used for Facebook Connect, iframe Canvas Pages, and Social
   Plugins (i.e. like buttons).  Without this attribute, IE will fail.
@@ -106,10 +107,10 @@ require an Application, read on...
   creates will not work properly on canvas pages.
 
 - Create an application on Facebook, currently at
-  http://www.facebook.com/developers/createapp.php. Fill in the
-  minimum required to get an apikey and secret. If supporting canvas
-  pages, specify a canvas name, too.  You may ignore other settings
-  for now.
+  https://developers.facebook.com/apps (click "create new app").  Fill
+  in the minimum required to get an apikey and secret.  If supporting
+  canvas pages, specify a canvas name, too.  You may ignore other
+  settings for now.
 
 - Go to Administer >> Site Building >> Facebook Applications and click
   the Add Applicaiton tab.  Use the app id, apikey and secret that
